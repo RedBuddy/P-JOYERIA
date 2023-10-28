@@ -1,0 +1,73 @@
+@use 'base/variables' as v;
+@use 'base/mixins' as m;
+
+
+
+body {
+    /*background: rgb(2, 0, 36);
+    background: linear-gradient(90deg, rgba(2, 0, 36, 1) 0%, rgba(6, 6, 98, 1) 37%, rgba(0, 212, 255, 1) 100%);
+    background-attachment: fixed;*/
+    background-color: rgb(32, 57, 120);
+    display: flex;
+    gap: 2rem;
+}
+
+aside {
+    background-color: rgb(28, 45, 89);
+    -webkit-box-shadow: 4px 2px 4px -1px rgba(0, 0, 0, 0.73);
+    -moz-box-shadow: 4px 2px 4px -1px rgba(0, 0, 0, 0.73);
+    box-shadow: 4px 2px 4px -1px rgba(0, 0, 0, 0.73);
+
+    width: 250px;
+    height: 1000px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .nav-modulo {
+        color: v.$blanco;
+    }
+
+}
+
+.nav-link {
+    width: 95%;
+    text-align: center;
+    margin: .4rem;
+    padding: 1rem;
+    border-radius: .3rem;
+
+    svg {
+        width: 15%;
+    }
+
+    span {
+        font-size: 1.8rem;
+    }
+
+
+    &:hover {
+        background-color: rgb(32 57 120 / 50%);
+    }
+}
+
+.nav-logo {
+    display: grid;
+    margin: 2rem;
+
+
+    img {
+        width: 55%;
+        grid-column: 1;
+        margin-left: 2.5rem;
+    }
+
+    h1 {
+        color: white;
+        grid-column: 2;
+        font-size: 3.5rem;
+        font-family: 'Pacifico', cursive;
+        margin-right: 2rem;
+    }
+}
