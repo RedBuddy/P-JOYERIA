@@ -1,0 +1,29 @@
+
+/* SECCION CONTENEDOR DE ITEMS */
+
+
+.contenedor {
+    width: 400px;
+    background-color: #000;
+    margin: 50px 100px;
+}
+
+.contenedor .contenedor-items{
+    overflow-y: auto;
+    height: 500px; /* Añade esto */
+    /* width: 60%; */
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    width: 100%;
+    transition: .3s;
+}
+.contenedor .contenedor-items .item{
+    max-width: 100px;
+    background-color: #666;
+    margin: auto;
+    border: 1px solid #666;
+    border-radius: 10px;
+    padding: 20px;
+    transition: .3s;
+    margin: 20px;
+}
