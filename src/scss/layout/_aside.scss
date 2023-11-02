@@ -8,8 +8,8 @@ body {
     background: linear-gradient(90deg, rgba(2, 0, 36, 1) 0%, rgba(6, 6, 98, 1) 37%, rgba(0, 212, 255, 1) 100%);
     background-attachment: fixed;*/
     background-color: rgb(32, 57, 120);
-    display: flex;
-    gap: 3rem;
+    display: grid;
+    grid-template-columns: 1fr 6fr;
 }
 
 aside {
@@ -18,7 +18,6 @@ aside {
     -moz-box-shadow: 4px 2px 4px -1px rgba(0, 0, 0, 0.73);
     box-shadow: 4px 2px 4px -1px rgba(0, 0, 0, 0.73);
 
-    width: 250px;
     height: 1000px;
 
     display: flex;
