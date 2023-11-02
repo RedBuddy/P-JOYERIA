@@ -8,8 +8,13 @@ body {
     background: linear-gradient(90deg, rgba(2, 0, 36, 1) 0%, rgba(6, 6, 98, 1) 37%, rgba(0, 212, 255, 1) 100%);
     background-attachment: fixed;*/
     background-color: rgb(32, 57, 120);
+<<<<<<< HEAD
     display: grid;
     grid-template-columns: 1fr 6fr;
+=======
+    display: flex;
+    gap: 3rem;
+>>>>>>> c179394a37227c982caf9439248b0a30e5806629
 }
 
 aside {
