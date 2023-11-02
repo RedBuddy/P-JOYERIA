@@ -1,0 +1,186 @@
+// .contenedor {
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+// }
+
+// .contenedor .menu {
+//     height: 525px;
+//     width: 1000px;
+//     background-color: aliceblue;
+//     border-radius: 25px;
+// }
+
+// .menu {
+//     display: flex;
+//     flex-wrap: wrap;
+//     justify-content: space-around; /* Esto distribuirá el espacio alrededor de los elementos de manera uniforme */
+// }
+
+// .btn {
+//     height: 300px; /* Ajusta esto a lo que necesites */
+//     display: flex;
+//     flex-direction: column;
+//     text-align: center;
+//     justify-content: center;
+//     align-items: center;
+//     flex-basis: calc(33.33%); /* Esto hará que los elementos ocupen al menos un tercio del ancho del contenedor, restando el margen */
+    
+// }
+
+// .btn h2 {
+//     margin-top: 2rem; 
+//     height: 50px; /* Ajusta esto a lo que necesites */
+//     font-size: 2.5rem;
+// }
+
+// .btn:nth-last-child(-n+2) { /* Esto seleccionará los últimos dos elementos */
+//     flex-basis: calc(50%); /* Esto hará que los últimos dos elementos ocupen al menos la mitad del ancho del contenedor, restando el margen */
+//     margin-bottom: 2rem;
+//     height: 200px; /* Ajusta esto a lo que necesites */
+// }
+
+// .menu img {
+//     width: 100px; /* Puedes ajustar esto a lo que necesites */
+//     height: 100px; /* Puedes ajustar esto a lo que necesites */
+// }
+
+// .btn:hover {
+//     border: 1rem solid blue;
+// }
+
+.nav {
+    display: flex;
+    order: 1;
+}
+
+.nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.nav li {
+    margin: 3rem;
+}
+
+
+.nav li a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.navegador {
+
+    display: flex;
+    background-color: #6699cc;
+    width: 100%;
+    height: 12.5rem;    
+    justify-content: space-around;
+}
+
+.nav img {
+    width: 5rem; /* Ajusta esto al tamaño que prefieras para las imágenes */
+    height: 5rem; /* Ajusta esto al tamaño que prefieras para las imágenes */
+    margin-right: 5px; /* Esto añade un margen a la derecha de las imágenes */
+    margin-bottom: 10px;
+}
+
+
+.nav ul li:hover{
+    border: 1px solid #000;
+}
+
+.cont {
+    display: flex;
+}
+
+.datos_compra {
+    margin: 50px 100px 0; 
+    font-size: 2rem;
+    color: #fff;
+}
+
+.producto, .cliente {
+    margin-right: 110px;
+}
+
+.contenido {
+    width: 100%;
+}
+
+
+.contenedor-items{
+    overflow-y: auto;
+    margin: 50px 100px 0; 
+    height: 450px; /* Añade esto */
+    /* width: 60%; */
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    transition: .3s;
+    width: 400px;
+}
+
+.item{
+    max-width: 100px;
+    background-color: #ffffff;
+    margin: 0px 20px 20px;
+    border: 1px solid #666;
+    border-radius: 10px;
+    padding: 30px;
+    transition: .3s;
+}
+
+.contenedor-items::-webkit-scrollbar {
+    width: 10px; /* Ajusta esto al tamaño que prefieras */
+  }
+  
+  /* Estilo para el pulgar de la barra de desplazamiento (la parte que se desplaza) */
+  .contenedor-items::-webkit-scrollbar-thumb {
+    background-color: #888; /* Ajusta esto al color que prefieras */
+    border-radius: 10px; /* Añade bordes redondeados al pulgar */
+  }
+  
+  /* Cambia el color del pulgar al pasar el mouse */
+  .contenedor-items::-webkit-scrollbar-thumb:hover {
+    background-color: #555; /* Ajusta esto al color que prefieras */
+  }
+
+.tabla {
+    
+    border-radius: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 50px 50px 0;
+  }
+  
+  th, td {
+    padding: 2rem;
+    text-align: left;
+  }
+  
+  th {
+    background-color: #f8f8f8;
+  }
+  
+  tr {
+    background-color: #f2f2f2;
+  }
+
+  .btn {
+    height: 50px;
+    display: flex;
+    border-radius: 20px;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 50px 50px 0;
+    background-color: #f3dfdf;
+  }
