@@ -1,7 +1,9 @@
 @use 'base/variables' as v;
 @use 'base/mixins' as m;
 
+
 .panel-clientes {
+    width: 100%;
     grid-column: 2;
 }
 

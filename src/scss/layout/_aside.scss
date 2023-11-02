@@ -3,25 +3,21 @@
 
 
 
+
 body {
-    /*background: rgb(2, 0, 36);
-    background: linear-gradient(90deg, rgba(2, 0, 36, 1) 0%, rgba(6, 6, 98, 1) 37%, rgba(0, 212, 255, 1) 100%);
-    background-attachment: fixed;*/
     background-color: rgb(32, 57, 120);
-    display: grid;
-    grid-template-columns: 1fr 6fr;
+    display: flex;
 }
 
 aside {
     background-color: rgb(28, 45, 89);
-    -webkit-box-shadow: 4px 2px 4px -1px rgba(0, 0, 0, 0.73);
-    -moz-box-shadow: 4px 2px 4px -1px rgba(0, 0, 0, 0.73);
-    box-shadow: 4px 2px 4px -1px rgba(0, 0, 0, 0.73);
 
-    height: 1000px;
+    width: 25rem;
+    height: 100%;
 
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
     align-items: center;
 
     .nav-modulo {
