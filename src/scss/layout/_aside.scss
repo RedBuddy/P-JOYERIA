@@ -27,17 +27,21 @@ aside {
 }
 
 .nav-link {
+    display: flex;
     width: 95%;
-    text-align: center;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
     margin: .4rem;
     padding: 1rem;
     border-radius: .3rem;
 
     svg {
-        width: 15%;
+        width: 12%;
     }
 
     span {
+        margin-top: .5rem;
         font-size: 1.8rem;
     }
 

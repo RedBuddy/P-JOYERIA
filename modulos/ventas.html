@@ -50,7 +50,7 @@
         <a href="#" class="nav-link">
             <span class="nav-modulo">Inventario</span>
         </a>
-        <a href="clientes.html" class="nav-link">
+        <a href="../modulos/clientes.html" class="nav-link">
             <span class="nav-modulo">Clientes</span>
         </a>
         <a href="#" class="nav-link">
@@ -71,21 +71,18 @@
     </aside>
 
     <div class="contenido">
-        <div class="navegador">
-            <nav class="nav">
-                <ul>
-                  <li><a href="#"><img src="../build/img/caja-registradora.webp" alt="">Registrar venta</a></li>
-                  <li><a href="#"><img src="../src/img/punto-de-venta.png" alt="">Registrar venta a credito</a></li>
-                  <li><a href="#"><img src="../src/img/hucha.png" alt="">Registrar abono</a></li>
-                  <li><a href="#"><img src="../src/img/historial.png" alt="">Ver historial de ventas</a></li>
-                  <li><a href="#"><img src="../src/img/informe.png" alt="">Generar informes de ventas</a></li>
-                </ul>
-            </nav>
-        </div>
+        <nav class="nav-sup">
+            <a class="nav-sup-link" href="#"><img src="../build/img/caja-registradora.webp" alt="">Registrar venta</a>
+            <a class="nav-sup-link" href="#"><img src="../src/img/punto-de-venta.png" alt="">Registrar venta a
+                credito</a>
+            <a class="nav-sup-link" href="#"><img src="../src/img/hucha.png" alt="">Registrar abono</a>
+            <a class="nav-sup-link" href="#"><img src="../src/img/historial.png" alt="">Ver historial de ventas</a>
+            <a class="nav-sup-link" href="#"><img src="../src/img/informe.png" alt="">Generar informes de ventas</a>
+        </nav>
 
         <div class="datos_compra">
             <form action="" class="form">
-                <label for="producto" >Producto</label>
+                <label for="producto">Producto</label>
                 <input type="text" name="producto" id="producto">
                 <input type="submit" name="producto" id="producto" value="Buscar" class="producto">
                 <label for="cliente">Cliente</label>
@@ -93,103 +90,138 @@
                 <label for="noventa" class="no_venta">No Venta</label>
             </form>
         </div>
-    
+
         <div class="cont">
             <div class="contenedor-items">
                 <div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
-                </div><div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
                 </div>
             </div>
 
-            
+
             <div class="tabla">
                 <table>
                     <tr>
-                    <th>Borrar</th>
-                      <th>Producto</th>
-                      <th>Cantidad</th> 
-                      <th>Precio</th>
-                      <th>Total</th>
+                        <th>Borrar</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Total</th>
                     </tr>
                     <tr>
                         <td></td>
-                      <td>Producto 1</td>
-                      <td>10</td> 
-                      <td>$5.00</td>
-                      <td>$50.00</td>
+                        <td>Producto 1</td>
+                        <td>10</td>
+                        <td>$5.00</td>
+                        <td>$50.00</td>
                     </tr>
                     <tr>
                         <td></td>
-                      <td>Producto 2</td>
-                      <td>5</td> 
-                      <td>$10.00</td>
-                      <td>$50.00</td>
+                        <td>Producto 2</td>
+                        <td>5</td>
+                        <td>$10.00</td>
+                        <td>$50.00</td>
                     </tr>
                     <tr>
                         <td></td>
-                      <td>Producto 2</td>
-                      <td>5</td> 
-                      <td>$10.00</td>
-                      <td>$50.00</td>
-                    </tr><tr>
+                        <td>Producto 2</td>
+                        <td>5</td>
+                        <td>$10.00</td>
+                        <td>$50.00</td>
+                    </tr>
+                    <tr>
                         <td></td>
-                      <td>Producto 2</td>
-                      <td>5</td> 
-                      <td>$10.00</td>
-                      <td>$50.00</td>
-                    </tr><tr>
+                        <td>Producto 2</td>
+                        <td>5</td>
+                        <td>$10.00</td>
+                        <td>$50.00</td>
+                    </tr>
+                    <tr>
                         <td></td>
-                      <td>Producto 2</td>
-                      <td>5</td> 
-                      <td>$10.00</td>
-                      <td>$50.00</td>
+                        <td>Producto 2</td>
+                        <td>5</td>
+                        <td>$10.00</td>
+                        <td>$50.00</td>
                     </tr>
                     <!-- Agrega más filas según sea necesario -->
-                  </table>
+                </table>
 
-                  
-            <div class="btn">
-                Finalizar
-            </div>
+
+                <div class="btn">
+                    Finalizar
+                </div>
 
             </div>
 
 
         </div>
 
-        
+
     </div>
 
 </body>
