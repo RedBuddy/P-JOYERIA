@@ -1,4 +1,23 @@
 
+import { hola } from './clientes.js';
+
+document.addEventListener('DOMContentLoaded', function () {
+    hola();
+    agregarcosa();
+});
+// Llama a la función exportada
+
+function agregarcosa() {
+    const nav = document.querySelector('.navegacion')
+
+    const p = document.createElement('div');
+    p.innerHTML = ``;
+
+    nav.appendChild(p);
+
+}
+
+
 /*
 document.addEventListener('DOMContentLoaded', function () {
     setgaleria();
