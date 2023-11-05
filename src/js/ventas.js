@@ -6,7 +6,6 @@ opcionesVenta.forEach((opcion) => {
     opcion.addEventListener('click', e => {
       e.preventDefault();
       let opcionSeleccionada = e.target.classList;
-      console.log(opcionSeleccionada);
       if(opcionSeleccionada.contains('venta-contado')){
         opcionVentaSeleccionada = 'venta-contado';
       }else if(opcionSeleccionada.contains('venta-credito')){

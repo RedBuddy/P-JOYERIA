@@ -7,61 +7,68 @@
     <title>Software Joyería</title>
 
     <!-- Preloads -->
-    <link rel="preload" href="build/css/app.css" as="style">
-    <link rel="stylesheet" href="build/css/app.css">
+    <link rel="preload" href="../build/css/app.css" as="style">
+    <link rel="stylesheet" href="../build/css/app.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-
-
 </head>
 
 <body>
 
     <aside class="navegacion">
-        <a href="index.html" class="nav-logo">
+        <a href="../index.html" class="nav-logo">
             <img src="../build/img/diamante.avif" alt="imagen">
             <h1>Joyería</h1>
         </a>
-        <a href="modulos/ventas.html" class="nav-link">
-            <img src="/build/img/ventas.webp" alt="venta imagen">
+        <a href="ventas.html" class="nav-link">
+            <img src="../build/img/ventas.webp" alt="venta imagen">
             <span class="nav-modulo">Ventas</span>
         </a>
-        <a href="modulos/inventario.html" class="nav-link">
-            <img src="build/img/inventario.webp" alt="inventario imagen">
+        <a href="inventario.html" class="nav-link">
+            <img src="../build/img/inventario.webp" alt="inventario imagen">
             <span class="nav-modulo">Inventario</span>
         </a>
-        <a href="modulos/clientes.html" class="nav-link">
-            <img src="build/img/clientes.webp" alt="clientes imagen">
+        <a href="clientes.html" class="nav-link">
+            <img src="../build/img/clientes.webp" alt="clientes imagen">
             <span class="nav-modulo">Clientes</span>
         </a>
         <a href="#" class="nav-link">
-            <img src="build/img/informes.webp" alt="informes imagen">
+            <img src="../build/img/informes.webp" alt="informes imagen">
             <span class="nav-modulo">Informes</span>
         </a>
         <a href="#" class="nav-link">
-            <img src="build/img/garantias.webp" alt="garantias imagen">
+            <img src="../build/img/garantias.webp" alt="garantias imagen">
             <span class="nav-modulo">Garantias</span>
         </a>
         <a href="#" class="nav-link">
-            <img src="build/img/empleados.webp" alt="empleados imagen">
+            <img src="../build/img/empleados.webp" alt="empleados imagen">
             <span class="nav-modulo">Empleados</span>
         </a>
         <a href="#" class="nav-link">
-            <img src="build/img/compras.webp" alt="compras imagen">
+            <img src="../build/img/compras.webp" alt="compras imagen">
             <span class="nav-modulo">Compras</span>
         </a>
         <a href="#" class="nav-link">
-            <img src="build/img/proveedores.webp" alt="proveedores imagen">
+            <img src="../build/img/proveedores.webp" alt="proveedores imagen">
             <span class="nav-modulo">Proveedores</span>
         </a>
     </aside>
 
+    <div class="panel-inventario">
+        <nav class="nav-sup">
+            <a class="nav-sup-link almacen-mp" href="#"><img src="../build/img/materia-prima.webp" alt="" class="almacen-mp">Almacen materia prima</a>
+            <a class="nav-sup-link almacen-pt" href="#"><img src="../src/img/producto-terminado.png" alt="" class="almacen-pt">Almacen producto terminado</a>
+        </nav>
 
-    <script type="module" src="./build/js/script.js"></script>
-    <script type="module" src="./build/js/clientes.js"></script>
+    
+
+    </div>
+
+
+
 </body>
-
+<script src="../src/js/inventario.js"></script>
 </html>
