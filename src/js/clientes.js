@@ -6,7 +6,7 @@ export const hola = () => console.log('hola')
 // });
 
 
-function agregarcosa() {
+function add_registrar_cliente() {
     const panel = document.querySelector('.panel-clientes')
 
 
@@ -38,6 +38,26 @@ function agregarcosa() {
 
 }
 
+function add_historial_cliente() {
+    const panel = document.querySelector('.panel-clientes')
+
+
+    const historial_cliente = document.createElement('div');
+    historial_cliente.classList.add('historial-cliente');
+    historial_cliente.innerHTML = `<h1>Historial de cliente</h1>
+    <form>
+        <label for="nombre">Nombre:</label>
+        <input class="rc-input-nombre" type="text" id="nombre" name="nombre"
+            placeholder="Ingrese el nombre del cliente" required>
+        <button type="submit">Aceptar</button>
+
+    </form>`;
+
+
+    panel.appendChild(historial_cliente);
+
+}
+
 
 const boton_agregar = document.querySelector('.clientes-agregar');
 
@@ -48,20 +68,32 @@ boton_agregar.addEventListener('click', function () {
     if (registrar_cliente) {
 
     } else {
-        agregarcosa();
+        add_registrar_cliente();
     }
 });
 
-const boton_historial = document.querySelector('.clientes-historial');
+// const boton_historial = document.querySelector('.clientes-historial');
 
 
-boton_historial.addEventListener('click', function () {
-    const registrar_cliente = document.querySelector('.registrar-cliente')
+// boton_historial.addEventListener('click', function () {
+//     const registrar_cliente = document.querySelector('.registrar-cliente')
 
-    if (registrar_cliente) {
-        registrar_cliente.remove();
-    } else {
-        agregarcosa();
-    }
-});
+//     if (registrar_cliente) {
+//         registrar_cliente.remove();
+//     } else {
+//         add_historial_cliente();
+//     }
+// });
+
+
+{/* <div class="historial-cliente">
+            <h1>Historial de cliente</h1>
+            <form>
+                <label for="nombre">Nombre:</label>
+                <input class="rc-input-nombre" type="text" id="nombre" name="nombre"
+                    placeholder="Ingrese el nombre del cliente" required>
+                <button type="submit">Aceptar</button>
+
+            </form>
+        </div> */}
 
