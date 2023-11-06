@@ -195,7 +195,7 @@ function pintarHtml(){
 
     `
   }else if(claseDivPrincipal === 'registrar-abono'){
-    divPrincipal.innerHTML = `<div class="abonar-saldos">
+    divPrincipal.innerHTML = `
     <div class="tablas">
         <table class="tabla">
             <tr>
@@ -231,8 +231,6 @@ function pintarHtml(){
 
         </div>
     </div>
-
-</div>
 `;
   }else if(claseDivPrincipal === 'historial-venta'){
     divPrincipal.innerHTML = `
