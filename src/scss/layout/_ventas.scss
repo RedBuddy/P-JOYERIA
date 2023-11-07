@@ -16,32 +16,42 @@
       margin-right:5rem;
     }
   }
-}
 
-.registrar-ventas {
-  display: flex;
-
-  .contenedor-productos-ventas {
-    overflow-y: auto;
-    margin: 5rem 10rem 0;
-    max-height: 45rem;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    transition: .3s;
-    width: 40rem;
+  .registrar-ventas {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  
+    .contenedor-productos-ventas {
+      overflow-y: auto;
+      margin: 5rem 10rem 0;
+      max-height: 45rem;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      transition: .3s;
+      width: 40rem;
+    }
+  
+    .producto {
+      max-width: 10rem;
+      background-color: #ffffff;
+      margin: 0px 2rem 2rem;
+      border: .1rem solid #666;
+      border-radius: 1rem;
+      padding: 3rem;
+      transition: .3s;
+    }
+  
   }
 
-  .producto {
-    max-width: 10rem;
-    background-color: #ffffff;
-    margin: 0px 2rem 2rem;
-    border: .1rem solid #666;
-    border-radius: 1rem;
-    padding: 3rem;
-    transition: .3s;
+  .historial-venta {
+    display: flex;
+    justify-content: center;
   }
 
 }
+
+
 
 .tablas {
     border-radius: 1rem;
