@@ -13,21 +13,21 @@ function add_registrar_cliente() {
     const registrar_cliente = document.createElement('div');
     registrar_cliente.classList.add('registrar-cliente');
     registrar_cliente.innerHTML = `<h1>Registro de cliente</h1>
-    <form>
+    <form class="form-clientes">
         <label for="nombre">Nombre:</label>
-        <input class="rc-input-nombre" type="text" id="nombre" name="nombre" placeholder="Ingrese el nombre"
+        <input class="rc-input-nombre" type="text" id="nombre" name="Nombre" placeholder="Ingrese el nombre"
             required>
 
         <label for="direccion">Dirección:</label>
-        <input class="rc-input-direccion" type="text" id="direccion" name="direccion"
+        <input class="rc-input-direccion" type="text" id="direccion" name="Direccion"
             placeholder="Ingrese la dirección" required>
 
         <label for="telefono">Teléfono:</label>
-        <input class="rc-input-telefono" type="text" id="telefono" name="telefono"
+        <input class="rc-input-telefono" type="text" id="telefono" name="Telefono"
             placeholder="Ingrese el número de teléfono" required>
 
         <label for="email">Correo Electrónico:</label>
-        <input class="rc-input-email" type="email" id="email" name="email"
+        <input class="rc-input-email" type="email" id="email" name="Correo"
             placeholder="Ingrese el correo electrónico" required>
 
         <button class="boton-registrar" type="submit">Registrar</button>
@@ -69,8 +69,30 @@ boton_agregar.addEventListener('click', function () {
 
     } else {
         add_registrar_cliente();
+        addevent_rcliente();
     }
 });
+
+function addevent_rcliente() {
+    const form_clientes = document.querySelector('.form-clientes');
+
+    form_clientes.addEventListener('submit', event => {
+        event.preventDefault();
+
+        const form_data = new FormData(form_clientes);
+        const data = new URLSearchParams(form_data)
+
+        fetch('http://localhost:3000/clientes', {
+            method: 'POST',
+            body: data
+        }).then(res => res.json())
+            .then(data => console.log(data))
+            .catch(error => console.log(error));
+
+
+    });
+}
+
 
 // const boton_historial = document.querySelector('.clientes-historial');
 
