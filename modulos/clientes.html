@@ -70,32 +70,82 @@
                 cliente</a>
         </nav>
 
+        <div class="barra-sup">
+            <div class="barra-sup-campo">
+                <label for="nombre">Buscar por nombre</label>
+                <input class="campo-nombre" type="text" name="nombre" required>
+                <button class="boton-registrar" type="submit">Consultar</button>
+            </div>
+
+            <div class="barra-sup-campo">
+                <label for="nombre">Buscar por ID</label>
+                <input class="campo-nombre" type="text" name="nombre" required>
+                <button class="boton-registrar" type="submit">Consultar</button>
+            </div>
+        </div>
+
+        <div class="info-cliente">
+            <div>
+                <h1>Datos de cliente</h1>
+            </div>
+
+            <div class="info-contenedor-datos">
+                <div class="info-cliente-dato">
+                    <label for="nombre">Nombre:</label>
+                    <label class="info-cliente-campo" for="direccion">Example</label>
+                </div>
+
+                <div class="info-cliente-dato">
+                    <label for="direccion">Dirección:</label>
+                    <label class="info-cliente-campo" for="direccion">Example</label>
+                </div>
+
+                <div class="info-cliente-dato">
+                    <label for="telefono">Teléfono:</label>
+                    <label class="info-cliente-campo" for="direccion">Example</label>
+                </div>
+
+                <div class="info-cliente-dato">
+                    <label for="email">Correo Electrónico:</label>
+                    <label class="info-cliente-campo" for="direccion">Example</label>
+                </div>
+            </div>
+        </div>
 
 
-        <!-- <div class="registrar-cliente">
-            <h1>Registro de cliente</h1>
-            <form>
-                <label for="nombre">Nombre:</label>
-                <input class="rc-input-nombre" type="text" id="nombre" name="nombre" placeholder="Ingrese el nombre"
-                    required>
 
-                <label for="direccion">Dirección:</label>
-                <input class="rc-input-direccion" type="text" id="direccion" name="direccion"
-                    placeholder="Ingrese la dirección" required>
+        <div class="historial-contenedor tablas">
+            <div class="tablas">
+                <table class="tabla">
+                    <tr>
+                        <th>ID de Venta</th>
+                        <th>Fecha de Venta</th>
+                        <th>ID del Cliente</th>
+                        <th>Nombre del Cliente</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Total</th>
+                        <th>Método de Pago</th>
+                    </tr>
+                    <tr>
+                        <td>001</td>
+                        <td>01/11/2023</td>
+                        <td>C001</td>
+                        <td>Juan Pérez</td>
+                        <td>Anillo</td>
+                        <td>2</td>
+                        <td>$1500</td>
+                        <td>$3000</td>
+                        <td>Tarjeta de Crédito</td>
+                    </tr>
+                    <!-- Agrega más filas según sea necesario -->
+                </table>
+            </div>
+        </div>
 
-                <label for="telefono">Teléfono:</label>
-                <input class="rc-input-telefono" type="text" id="telefono" name="telefono"
-                    placeholder="Ingrese el número de teléfono" required>
 
-                <label for="email">Correo Electrónico:</label>
-                <input class="rc-input-email" type="email" id="email" name="email"
-                    placeholder="Ingrese el correo electrónico" required>
-
-                <button type="submit">Registrar</button>
-            </form>
-        </div> -->
     </section>
-
 
 
 
