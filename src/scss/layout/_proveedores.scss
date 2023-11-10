@@ -1,0 +1,107 @@
+.panel-proveedores {
+
+    width: 100%;
+
+    .datos-proveedores {
+        display: flex;
+        width: 100%;
+        height: 6rem;
+        background-color: #4a76a2;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: #fff;
+
+        input[type="submit"] {
+            margin-right: 5rem;
+        }
+    }
+
+    .formulario {
+        overflow-y: auto;
+        height: 70rem;
+
+        h2 {
+            font-size: 5rem;
+            margin: 2rem 0;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: .5rem;
+            box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
+            max-width: 45rem;
+            margin: 2rem auto 0;
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        form input[type="text"],
+        form input[type="number"],
+        form input[type="date"],
+        form input[type="email"],
+        form input[type="tel"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        form button {
+            display: block;
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    }
+
+    .tablas {
+        width: 93%;
+
+
+        .tabla {
+            border-collapse: collapse;
+            margin: 5rem 5rem 0;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        
+            align-items: center;
+            th,
+            td {
+                padding: 2rem;
+                text-align: left;
+            }
+
+            th {
+                background-color: #f8f8f8;
+            }
+
+            tr {
+                background-color: #f2f2f2;
+            }
+        }
+
+        .btn {
+            height: 5rem;
+            display: flex;
+            border-radius: 2rem;
+            justify-content: center;
+            align-items: center;
+            margin: 5rem 5rem 0;
+            min-width: 15rem;
+            max-width: 52.5rem;
+            background-color: #6f6b6b;
+        }
+    }
+
+}
