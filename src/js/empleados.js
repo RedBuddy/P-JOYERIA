@@ -1,6 +1,6 @@
-let opcionesEmpleados = document.querySelectorAll('.panel-empleados .nav-sup .nav-sup-link');
-let panelEmpleados = document.querySelector('.panel-proveedores .nav-sup');
-let divPanel = document.querySelector('.panel-empleados');
+let opcionesEmpleados = document.querySelectorAll('.panel .nav-sup .nav-sup-link');
+let panelEmpleados = document.querySelector('.panel .nav-sup');
+let divPanel = document.querySelector('.panel');
 let opcionEmpleadosSeleccionada;
 
 opcionesEmpleados.forEach((opcion) => {
@@ -20,7 +20,7 @@ opcionesEmpleados.forEach((opcion) => {
 });
 
 function limpiarHtml(){
-    let opciones = ['tablas','registrar-empleados','datos-empleados','informacion-labolares','eliminar-empleados'];
+    let opciones = ['tablas','registrar-empleados','form-datos','informacion-labolares','eliminar-empleados'];
     let selector = opciones.map(opc => '.' + opc).join(', ');
     let elementos = divPanel.querySelectorAll(selector);
   
@@ -51,7 +51,7 @@ function pintarHtml(){
         </div>`;
         }
         campos = ['nombre-empleado'];
-        divDatos.classList.add('datos-empleados');
+        divDatos.classList.add('form-datos');
         divDatos.innerHTML = crearFormulario(campos,"");
         divPanel.appendChild(divDatos);
         let tablas = document.createElement('div');
@@ -60,20 +60,15 @@ function pintarHtml(){
         tabla.classList.add('tabla');
         tabla.innerHTML = ` <tbody>
         <tr>
-            <th>ID del Producto</th>
-            <th>Nombre del Producto</th>
-            <th>Descripción del Producto</th>
-            <th>Cantidad en Stock</th>
-            <th>Precio de Venta</th>
+            <th>ID EMPLEADO</th>
+            <th>EMPLEADO</th>
+            <th>RFC</th>
+            <th>CELULAR</th>
+            <th>CORREO</th>
+            <th>DIRECCION</th>
+            <th>PUESTO</th>
+            <th>ACTIVO</th>
         </tr>
-        <tr>
-            <td>001</td>
-            <td>01/11/2023</td>
-            <td>C001</td>
-            <td>Juan Pérez</td>
-            <td>Anillo</td>
-        </tr>
-        <!-- Agrega más filas según sea necesario -->
     </tbody>
     ${aux}
     

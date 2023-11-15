@@ -1,5 +1,5 @@
-let opcionesVenta = document.querySelectorAll('.panel-ventas .nav-sup .nav-sup-link');
-let divPanel = document.querySelector('.panel-ventas');
+let opcionesVenta = document.querySelectorAll('.panel .nav-sup .nav-sup-link');
+let divPanel = document.querySelector('.panel');
 let opcionVentaSeleccionada;
 
 opcionesVenta.forEach((opcion) => {
@@ -23,7 +23,7 @@ opcionesVenta.forEach((opcion) => {
 function pintarHtml(){
   limpiarHtml();
   let divDatosCompra = document.createElement('div');
-  divDatosCompra.classList.add('datos-compra');
+  divDatosCompra.classList.add('form-datos');
   let campos;
   let claseDivPrincipal;
 
@@ -74,42 +74,6 @@ function pintarHtml(){
             <th>Precio</th>
             <th>Total</th>
         </tr>
-        <tr>
-            <td></td>
-            <td>Producto 1</td>
-            <td>10</td>
-            <td>$5.00</td>
-            <td>$50.00</td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>Producto 2</td>
-            <td>5</td>
-            <td>$10.00</td>
-            <td>$50.00</td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>Producto 2</td>
-            <td>5</td>
-            <td>$10.00</td>
-            <td>$50.00</td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>Producto 2</td>
-            <td>5</td>
-            <td>$10.00</td>
-            <td>$50.00</td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>Producto 2</td>
-            <td>5</td>
-            <td>$10.00</td>
-            <td>$50.00</td>
-        </tr>
-        <!-- Agrega más filas según sea necesario -->
     </table>
 
         <div class="btn">
@@ -146,53 +110,16 @@ function pintarHtml(){
             <th>Precio</th>
             <th>Total</th>
         </tr>
-        <tr>
-            <td></td>
-            <td>Producto 1</td>
-            <td>10</td>
-            <td>$5.00</td>
-            <td>$50.00</td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>Producto 2</td>
-            <td>5</td>
-            <td>$10.00</td>
-            <td>$50.00</td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>Producto 2</td>
-            <td>5</td>
-            <td>$10.00</td>
-            <td>$50.00</td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>Producto 2</td>
-            <td>5</td>
-            <td>$10.00</td>
-            <td>$50.00</td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>Producto 2</td>
-            <td>5</td>
-            <td>$10.00</td>
-            <td>$50.00</td>
-        </tr>
-        <!-- Agrega más filas según sea necesario -->
     </table>
     <div class="grupo-btn-ventas">
                     <div class="btn">
                         Finalizar
                     </div>
         
-                    <div class="btn" id="myBtn">
+                    <div class="btn">
                         Plan de pagos
                     </div>
                   </div>
-
     `
   }else if(claseDivPrincipal === 'registrar-abono'){
     divPrincipal.innerHTML = `
@@ -201,35 +128,16 @@ function pintarHtml(){
             <tr>
                 <th>ID de Venta</th>
                 <th>Fecha de Venta</th>
-                <th>Producto</th>
-                <th>Cantidad</th>
-                <th>Precio Unitario</th>
-                <th>Total</th>
-                <th>Abonado</th>
-                <th>Saldo</th>
+                <th>ID de Cliente</th>
+                <th>Monto Total</th>
+                <th>Monto Pagado</th>
+                <th>Monto Restante</th>
+                <th>Estatus</th>
             </tr>
-            <tr>
-                <td>001</td>
-                <td>01/11/2023</td>
-                <td>Anillo</td>
-                <td>2</td>
-                <td>$1500</td>
-                <td>$3000</td>
-                <td>$1500</td>
-                <td>$1500</td>
-            </tr>
-            <!-- Agrega más filas según sea necesario -->
         </table>
-        <div class="grupo-btn-ventas">
-            <div class="btn" id="miBoton">
+            <div class="btn">
                 Abonar a Cuenta
             </div>
-
-            <div class="btn">
-                Abonar a Venta Específica
-            </div>
-
-        </div>
     </div>
 `;
   }else if(claseDivPrincipal === 'historial-venta'){
@@ -241,22 +149,11 @@ function pintarHtml(){
         <th>Fecha de Venta</th>
         <th>ID del Cliente</th>
         <th>Nombre del Cliente</th>
-        <th>Producto</th>
-        <th>Cantidad</th>
-        <th>Precio Unitario</th>
+        <th>Productos</th>
+        <th>Tipo de Venta</th>
         <th>Total</th>
         <th>Método de Pago</th>
-      </tr>
-      <tr>
-        <td>001</td>
-        <td>01/11/2023</td>
-        <td>C001</td>
-        <td>Juan Pérez</td>
-        <td>Anillo</td>
-        <td>2</td>
-        <td>$1500</td>
-        <td>$3000</td>
-        <td>Tarjeta de Crédito</td>
+        <th>Estatus</th>
       </tr>
       <!-- Agrega más filas según sea necesario -->
     </table>
@@ -283,7 +180,7 @@ function crearFormulario(campos) {
 }
 
 function limpiarHtml(){
-  let opciones = ['datos-compra','registrar-ventas','registrar-abono','historial-venta'];
+  let opciones = ['form-datos','registrar-ventas','registrar-abono','historial-venta'];
   let selector = opciones.map(opc => '.' + opc).join(', ');
   let elementos = divPanel.querySelectorAll(selector);
 
