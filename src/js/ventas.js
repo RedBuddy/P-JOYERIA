@@ -3,37 +3,37 @@ let divPanel = document.querySelector('.panel-ventas');
 let opcionVentaSeleccionada;
 
 opcionesVenta.forEach((opcion) => {
-    opcion.addEventListener('click', e => {
-      e.preventDefault();
-      let opcionSeleccionada = e.target.classList;
-      if(opcionSeleccionada.contains('venta-contado')){
-        opcionVentaSeleccionada = 'venta-contado';
-      }else if(opcionSeleccionada.contains('venta-credito')){
-        opcionVentaSeleccionada = 'venta-credito';
-      }else if(opcionSeleccionada.contains('registrar-abonos')){
-        opcionVentaSeleccionada = 'registrar-abono';
-      }else if(opcionSeleccionada.contains('historial-ventas')){
-        opcionVentaSeleccionada = 'historial-venta';
-      }
+  opcion.addEventListener('click', e => {
+    e.preventDefault();
+    let opcionSeleccionada = e.target.classList;
+    if (opcionSeleccionada.contains('venta-contado')) {
+      opcionVentaSeleccionada = 'venta-contado';
+    } else if (opcionSeleccionada.contains('venta-credito')) {
+      opcionVentaSeleccionada = 'venta-credito';
+    } else if (opcionSeleccionada.contains('registrar-abonos')) {
+      opcionVentaSeleccionada = 'registrar-abono';
+    } else if (opcionSeleccionada.contains('historial-ventas')) {
+      opcionVentaSeleccionada = 'historial-venta';
+    }
     pintarHtml();
-    });
+  });
 });
 
 
-function pintarHtml(){
+function pintarHtml() {
   limpiarHtml();
   let divDatosCompra = document.createElement('div');
   divDatosCompra.classList.add('datos-compra');
   let campos;
   let claseDivPrincipal;
 
-  if(opcionVentaSeleccionada === 'venta-contado' || opcionVentaSeleccionada === 'venta-credito'){
+  if (opcionVentaSeleccionada === 'venta-contado' || opcionVentaSeleccionada === 'venta-credito') {
     campos = ['producto', 'cliente'];
     claseDivPrincipal = 'registrar-ventas'
-  }else if(opcionVentaSeleccionada === 'registrar-abono'){
+  } else if (opcionVentaSeleccionada === 'registrar-abono') {
     campos = ['cliente'];
     claseDivPrincipal = opcionVentaSeleccionada;
-  }else if(opcionVentaSeleccionada === 'historial-venta'){
+  } else if (opcionVentaSeleccionada === 'historial-venta') {
     campos = ['venta', 'cliente'];
     claseDivPrincipal = opcionVentaSeleccionada;
   }
@@ -44,7 +44,7 @@ function pintarHtml(){
   let divPrincipal = document.createElement('div');
   console.log(claseDivPrincipal);
   divPrincipal.classList.add(claseDivPrincipal);
-  if(claseDivPrincipal === 'registrar-ventas' && opcionVentaSeleccionada === 'venta-contado'){
+  if (claseDivPrincipal === 'registrar-ventas' && opcionVentaSeleccionada === 'venta-contado') {
     divPrincipal.innerHTML = `
     <div class="contenedor-productos-ventas">
     <div class="producto">
@@ -116,7 +116,7 @@ function pintarHtml(){
             Finalizar
         </div>
     `;
-  }else if(claseDivPrincipal === 'registrar-ventas' && opcionVentaSeleccionada === 'venta-credito'){
+  } else if (claseDivPrincipal === 'registrar-ventas' && opcionVentaSeleccionada === 'venta-credito') {
     divPrincipal.innerHTML = `
     <div class="contenedor-productos-ventas">
     <div class="producto">
@@ -194,7 +194,7 @@ function pintarHtml(){
                   </div>
 
     `
-  }else if(claseDivPrincipal === 'registrar-abono'){
+  } else if (claseDivPrincipal === 'registrar-abono') {
     divPrincipal.innerHTML = `
     <div class="tablas">
         <table class="tabla">
@@ -232,7 +232,7 @@ function pintarHtml(){
         </div>
     </div>
 `;
-  }else if(claseDivPrincipal === 'historial-venta'){
+  } else if (claseDivPrincipal === 'historial-venta') {
     divPrincipal.innerHTML = `
       <div class="tablas">
       <table class="tabla">
@@ -270,7 +270,7 @@ function pintarHtml(){
 
 function crearFormulario(campos) {
   let formulario = '<form action="" class="form">';
-  
+
   campos.forEach(campo => {
     formulario += `
       <label for="${campo}">${campo.charAt(0).toUpperCase() + campo.slice(1)}</label>
@@ -282,8 +282,8 @@ function crearFormulario(campos) {
   return formulario;
 }
 
-function limpiarHtml(){
-  let opciones = ['datos-compra','registrar-ventas','registrar-abono','historial-venta'];
+function limpiarHtml() {
+  let opciones = ['datos-compra', 'registrar-ventas', 'registrar-abono', 'historial-venta'];
   let selector = opciones.map(opc => '.' + opc).join(', ');
   let elementos = divPanel.querySelectorAll(selector);
 

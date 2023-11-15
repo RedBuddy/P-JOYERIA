@@ -25,22 +25,43 @@ function add_registrar_cliente() {
     registrar_cliente.classList.add('registrar-cliente');
     registrar_cliente.innerHTML = `<h1>Registro de cliente</h1>
     <form class="form-clientes">
-        <label for="nombre">Nombre:</label>
-        <input class="rc-input-nombre" type="text" id="nombre" name="Nombre" placeholder="Ingrese el nombre"
-            required>
-
-        <label for="direccion">Dirección:</label>
-        <input class="rc-input-direccion" type="text" id="direccion" name="Direccion"
-            placeholder="Ingrese la dirección" required>
-
-        <label for="telefono">Teléfono:</label>
-        <input class="rc-input-telefono" type="text" id="telefono" name="Telefono"
-            placeholder="Ingrese el número de teléfono" required>
-
-        <label for="email">Correo Electrónico:</label>
-        <input class="rc-input-email" type="email" id="email" name="Correo"
-            placeholder="Ingrese el correo electrónico" required>
-
+        <div>
+            <label for="nombre">Nombre(s):</label>
+            <input class="rc-input-nombre" type="text" name="Nombre" placeholder="Ingrese el nombre" required>
+        </div>
+        <div>
+            <label for="nombre">Apellido(s):</label>
+            <input class="rc-input-apellido" type="text" name="Apellido" placeholder="Ingrese el apellido"
+                required>
+        </div>
+        <div>
+            <label for="direccion">Dirección:</label>
+            <input class="rc-input-direccion" type="text" name="Direccion" placeholder="Ingrese la dirección"
+                required>
+        </div>
+        <div>
+            <label for="ciudad">Ciudad:</label>
+            <input class="rc-input-ciudad" type="text" name="Ciudad" placeholder="Ingrese la ciudad" required>
+        </div>
+        <div>
+            <label for="telefono">Teléfono:</label>
+            <input class="rc-input-telefono" type="text" name="Telefono" placeholder="Ingrese el número de tel."
+                required>
+        </div>
+        <div>
+            <label for="email">Correo Electrónico:</label>
+            <input class="rc-input-email" type="email" name="Correo" placeholder="Ingrese el correo electrónico"
+                required>
+        </div>
+        <div>
+            <label for="email">RFC:</label>
+            <input class="rc-input-rfc" type="text" name="RFC" placeholder="Ingrese el RFC" required>
+        </div>
+        <div>
+            <label for="credito">Credito Maximo:</label>
+            <input class="rc-input-credito" type="text" name="Credito_Maximo" placeholder="Ingrese el monto"
+                required>
+        </div>
         <button class="boton-registrar" type="submit">Registrar</button>
     </form>`;
 
@@ -82,7 +103,10 @@ function addevent_rcliente() {
         event.preventDefault();
 
         const form_data = new FormData(form_clientes);
-        const data = new URLSearchParams(form_data)
+        const data = new URLSearchParams(form_data);
+
+        console.log(form_data)
+        console.log(data)
 
         fetch('http://localhost:3000/clientes', {
             method: 'POST',
@@ -90,8 +114,6 @@ function addevent_rcliente() {
         }).then(res => res.json())
             .then(data => console.log(data))
             .catch(error => console.log(error));
-
-
     });
 }
 
