@@ -1,36 +1,37 @@
 .tablas {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 5rem;
 
-    .tabla {
-      border-collapse: collapse;
-      margin: 5rem 5rem 0;
+  .tabla {
+    border-collapse: collapse;
+    margin: 5rem 5rem 0;
 
-      th,
-      td {
-        padding: 2rem;
-        text-align: left;
-      }
-
-      th {
-        background-color: #f8f8f8;
-      }
-
-      tr {
-        background-color: #f2f2f2;
-      }
+    th,
+    td {
+      padding: 1.4rem;
+      text-align: left;
     }
-    
-    .grupo-btn-ventas{
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
+
+    th {
+      background-color: #f8f8f8;
+    }
+
+    tr {
+      background-color: #f2f2f2;
+    }
   }
 
-  
+  .grupo-btn-ventas {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
+
+
   .btn {
     height: 5rem;
     display: flex;
@@ -43,4 +44,8 @@
     background-color: #f3dfdf;
   }
 
+  .dataTables_filters label{
+    font-size: 2rem;
+  }
 }
+

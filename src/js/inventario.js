@@ -1,26 +1,35 @@
 let opcionesInventario = document.querySelectorAll('.panel .nav-sup .nav-sup-link');
 let panelInventario = document.querySelector('.panel .nav-sup');
 let divPanel = document.querySelector('.panel');
+let tipoTabla;
+let accionTabla;
 let opcionInventarioSeleccionada;
-
+//AQUI LE DOY MOVILIDAD A MI NAVEGACION
 opcionesInventario.forEach((opcion) => {
     opcion.addEventListener('click', e => {
         e.preventDefault();
         limpiarHtml(panelInventario)
         let opcionSeleccionada = e.target.classList;
-        if (opcionSeleccionada.contains('almacen-mp')) {
-            opcionInventarioSeleccionada = 'almacen-mp';
-        } else if (opcionSeleccionada.contains('almacen-pt')) {
-            opcionInventarioSeleccionada = 'almacen-pt';
-        } else if (opcionSeleccionada.contains('categorias')) {
-            opcionInventarioSeleccionada = 'categorias';
+        if (opcionSeleccionada.contains('almacen_mp')) {
+            opcionInventarioSeleccionada = 'almacen_mp';
+        } else if (opcionSeleccionada.contains('almacen_pt')) {
+            opcionInventarioSeleccionada = 'almacen_pt';
+        } else if (opcionSeleccionada.contains('categoria')) {
+            opcionInventarioSeleccionada = 'categoria';
+        } else if (opcionSeleccionada.contains('materia_prima')) {
+            opcionInventarioSeleccionada = 'materia_prima';
+        } else if (opcionSeleccionada.contains('producto_terminado')) {
+            opcionInventarioSeleccionada = 'producto_terminado';
         }
+        tipoTabla = opcionInventarioSeleccionada;
+        //VUELVO A PINTAR EL NAV, PQ CADA OPCION TIENE SU NAVEGACION
         pintarNav(opcionInventarioSeleccionada);
     });
 });
 
+//CADA QUE SE ACTUALICE , O SE OPRIME UNA NUEVA OPCION
 function limpiarHtml() {
-    let opciones = ['form-datos', 'entrada-materia', 'tablas', 'salida-materia', 'entrada-producto', 'salida-producto', 'formulario'];
+    let opciones = ['form-datos', 'entrada-materia', 'tablas', 'salida-materia', 'entrada-producto', 'salida-producto', 'formulario', 'almacen-mp', 'form'];
     let selector = opciones.map(opc => '.' + opc).join(', ');
     let elementos = divPanel.querySelectorAll(selector);
 
@@ -28,29 +37,24 @@ function limpiarHtml() {
         elemento.remove();
     });
 }
-
+//AQUI YO GENERO UN NUEVO NAV, PQ ESTE MODULO LO REQUIERE
 function generarNav(opcion) {
     let titulo = '';
     let texto = '';
-    if (opcion === 'almacen-mp') {
-        texto = "mp";
-        titulo = "materia prima";
-    } else if (opcion === 'almacen-pt') {
-        texto = "pt"
-        titulo = "producto terminado";
-    } else if (opcion === 'categorias') {
+    if (opcion === 'almacen_mp' || opcion === 'almacen_pt') {
         return `
-        <a class="nav-sup-link agregar-categoria" href="#"><img src="../src/img/agregar-categorias.png" alt="" class="agregar-categoria">Agregar categoria</a>
-        <a class="nav-sup-link editar-categoria" href="#"><img src="../src/img/editar-categoria.png" alt="" class="editar-categoria">Editar categoria</a>
-        <a class="nav-sup-link lista-categoria" href="#"><img src="../src/img/lista-categoria.png" alt="" class="lista-categoria">Lista de categorias</a>
-        <a class="nav-sup-link eliminar-categoria" href="#"><img src="../src/img/eliminar-categoria.png" alt="" class="eliminar-categoria">Eliminar categoria</a>`;
+        <a class="nav-sup-link consultar_${opcion}" href="#"><img src="../src/img/almacen.png" alt="" class="consultar_${opcion}">Consultar almacen</a>
+        <a class="nav-sup-link entrada_${opcion}" href="#"><img src="../src/img/entrada.png" alt="" class="entrada_${opcion}">Registrar entrada</a>
+        <a class="nav-sup-link salida_${opcion}" href="#"><img src="../src/img/salida.png" alt="" class="salida_${opcion}">Registrar salida</a>
+        `;
     }
-
+    titulo = formatText(opcion).toLowerCase();
     return `
-        <a class="nav-sup-link consultar-${texto}" href="#"><img src="../src/img/almacen-mp.png" alt="" class="consultar-${texto}">Consultar almacen</a>
-        <a class="nav-sup-link entrada-${texto}" href="#"><img src="../src/img/entrada.png" alt="" class="entrada-${texto}">Registrar entrada</a>
-        <a class="nav-sup-link devoluciones" href="#"><img src="../src/img/salida.png" alt="" class="salida-${texto}">Registrar salida</a>
-        <a class="nav-sup-link agregar-${texto}" href="#"><img src="../src/img/${titulo}.png" alt="" class="agregar-${texto}">Agregar ${titulo}</a>`;
+        <a class="nav-sup-link agregar_${opcion}" href="#"><img src="../src/img/${titulo}.png" alt="" class="agregar_${opcion}">Agregar ${titulo}</a>
+        <a class="nav-sup-link consultar_${opcion}" href="#"><img src="../src/img/consultar_${titulo}.png" alt="" class="consultar_${opcion}">Consultar ${titulo}</a>
+        <a class="nav-sup-link editar_${opcion}" href="#"><img src="../src/img/editar.png" alt="" class="editar_${opcion}">Editar ${titulo}</a>
+        <a class="nav-sup-link eliminar_${opcion}" href="#"><img src="../src/img/eliminar.png" alt="" class="eliminar_${opcion}">Eliminar ${titulo}</a>
+        `;
 }
 
 
@@ -58,6 +62,7 @@ function pintarNav() {
     panelInventario.innerHTML = generarNav(opcionInventarioSeleccionada);
     agregarEventListeners();
 }
+
 
 function agregarEventListeners() {
     let opcionesInventario = document.querySelectorAll('.panel .nav-sup .nav-sup-link');
@@ -67,310 +72,477 @@ function agregarEventListeners() {
             e.preventDefault();
             limpiarHtml(divPanel)
             let opcionSeleccionada = e.target.classList;
-            if (opcionSeleccionada.contains('consultar-mp')) {
-                opcionInventarioSeleccionada = 'consultar-mp';
-            } else if (opcionSeleccionada.contains('entrada-mp')) {
-                opcionInventarioSeleccionada = 'entrada-mp';
-            } else if (opcionSeleccionada.contains('salida-mp')) {
-                opcionInventarioSeleccionada = 'salida-mp';
-            } else if (opcionSeleccionada.contains('consultar-pt')) {
-                opcionInventarioSeleccionada = 'consultar-pt';
-            } else if (opcionSeleccionada.contains('entrada-pt')) {
-                opcionInventarioSeleccionada = 'entrada-pt';
-            } else if (opcionSeleccionada.contains('salida-pt')) {
-                opcionInventarioSeleccionada = 'salida-pt';
-            } else if (opcionSeleccionada.contains('agregar-mp')) {
-                opcionInventarioSeleccionada = 'agregar-mp';
-            } else if (opcionSeleccionada.contains('agregar-categoria')) {
-                opcionInventarioSeleccionada = 'agregar-categoria';
-            } else if (opcionSeleccionada.contains('eliminar-categoria')) {
-                opcionInventarioSeleccionada = 'eliminar-categoria';
-            } else if (opcionSeleccionada.contains('editar-categoria')) {
-                opcionInventarioSeleccionada = 'editar-categoria';
-            } else if (opcionSeleccionada.contains('lista-categoria')) {
-                opcionInventarioSeleccionada = 'lista-categoria';
-            } else if (opcionSeleccionada.contains('agregar-pt')) {
-                opcionInventarioSeleccionada = 'agregar-pt';
+            if (opcionSeleccionada.contains('consultar_almacen_mp')) {
+                //ME VA INDICAR QUE SE VA HACER, PARA SABER LOS DATOS QUE TENDRAN LOS CAMPOS, Y LOS THTABLA
+                opcionInventarioSeleccionada = 'consultar_almacen_mp';
+                //ME INDICA QUE VA HACER LA API
+                accionTabla = "consultar";
+            } else if (opcionSeleccionada.contains('entrada_almacen_mp')) {
+                opcionInventarioSeleccionada = 'entrada_almacen_mp';
+                accionTabla = "agregar";
+            } else if (opcionSeleccionada.contains('salida_almacen_mp')) {
+                opcionInventarioSeleccionada = 'salida_almacen_mp';
+                accionTabla = "editar";
+            } else if (opcionSeleccionada.contains('consultar_almacen_pt')) {
+                opcionInventarioSeleccionada = 'consultar_almacen_pt';
+                accionTabla = "consultar";
+            } else if (opcionSeleccionada.contains('entrada_almacen_pt')) {
+                opcionInventarioSeleccionada = 'entrada_almacen_pt';
+                accionTabla = "agregar";
+            } else if (opcionSeleccionada.contains('salida_almacen_pt')) {
+                opcionInventarioSeleccionada = 'salida_almacen_pt';
+                accionTabla = "editar";
+            } else if (opcionSeleccionada.contains('agregar_materia_prima')) {
+                opcionInventarioSeleccionada = 'agregar_materia_prima';
+                accionTabla = "agregar";
+            } else if (opcionSeleccionada.contains('agregar_categoria')) {
+                opcionInventarioSeleccionada = 'agregar_categoria';
+                accionTabla = "agregar";
+            } else if (opcionSeleccionada.contains('eliminar_categoria')) {
+                opcionInventarioSeleccionada = 'eliminar_categoria';
+                accionTabla = "eliminar";
+            } else if (opcionSeleccionada.contains('editar_categoria')) {
+                opcionInventarioSeleccionada = 'editar_categoria';
+                accionTabla = "editar";
+            } else if (opcionSeleccionada.contains('consultar_categoria')) {
+                opcionInventarioSeleccionada = 'consultar_categoria';
+                accionTabla = "consultar";
+            } else if (opcionSeleccionada.contains('agregar_producto_terminado')) {
+                opcionInventarioSeleccionada = 'agregar_producto_terminado';
+                accionTabla = "agregar";
+            } else if (opcionSeleccionada.contains('consultar_materia_prima')) {
+                opcionInventarioSeleccionada = 'consultar_materia_prima';
+                accionTabla = "consultar";
+            } else if (opcionSeleccionada.contains('consultar_producto_terminado')) {
+                opcionInventarioSeleccionada = 'consultar_producto_terminado';
+                accionTabla = "consultar";
+            } else if (opcionSeleccionada.contains('editar_materia_prima')) {
+                opcionInventarioSeleccionada = 'editar_materia_prima';
+                accionTabla = "editar";
+            } else if (opcionSeleccionada.contains('editar_producto_terminado')) {
+                opcionInventarioSeleccionada = 'editar_producto_terminado';
+                accionTabla = "editar";
+            } else if (opcionSeleccionada.contains('eliminar_materia_prima')) {
+                opcionInventarioSeleccionada = 'eliminar_materia_prima';
+                accionTabla = "eliminar";
+            } else if (opcionSeleccionada.contains('eliminar_producto_terminado')) {
+                opcionInventarioSeleccionada = 'eliminar_producto_terminado';
+                accionTabla = "eliminar";
             }
+            console.log(opcionInventarioSeleccionada);
             pintarHtml();
         });
     });
 }
 
 function pintarHtml() {
-    // let campos;
+    //LA CATEGORIA ES EL UNICO SUBSISTEMA QUE CAMBIA 
+    if(tipoTabla === 'categoria_mp' || tipoTabla === 'categoria_pt'){
+        tipoTabla = 'categoria';
+    }
+
     let divDatos = document.createElement('div');
-
-    //     if (opcionInventarioSeleccionada === 'consultar-mp') {
-    //         campos = ['materia-prima'];
-    //         divDatos.classList.add('form-datos');
-    //         divDatos.innerHTML = crearFormularioNav(campos);
-    //         divPanel.appendChild(divDatos);
-    //         let tablas = document.createElement('div');
-    //         tablas.classList.add('tablas');
-    //         let tabla = document.createElement('table');
-    //         tabla.classList.add('tabla');
-    //         tabla.innerHTML = ` <tbody>
-    //         <tr>
-    //             <th>ID Materia Prima</th>
-    //             <th>Nombre</th>
-    //             <th>Categoria</th>
-    //             <th>Cantidad en Stock</th>
-    //             <th>Precio de Compra</th>
-    //         </tr>
-    //     </tbody>
-    // `;
-    //         tablas.appendChild(tabla);
-    //         divPanel.appendChild(tablas);
-    //     } else if (opcionInventarioSeleccionada === 'entrada-mp') {
-    //         divDatos.classList.add('almacen-mp','formulario');
-    //         campos = ['Id_materia_prima','cantidad',"fecha"];
-    //         divDatos.innerHTML = crearFormulario(campos);
-    //         divPanel.appendChild(divDatos);
-
-    //         let btnRegistrar = document.querySelector('#formulario-registro button');
-    //         console.log(btnRegistrar)
-    //         btnRegistrar.addEventListener('click', (e) => {
-    //             tomarDatos(e);
-    //         });
-    //     } else if (opcionInventarioSeleccionada === 'salida-mp') {
-    //         divDatos.classList.add('almacen-mp','formulario');
-    //         campos = ['Id_materia_prima','cantidad',"fecha","motivo"];
-    //         divDatos.innerHTML = crearFormulario(campos);
-    //         divPanel.appendChild(divDatos);
-    //         let btnRegistrar = document.querySelector('#formulario-registro button');
-    //         console.log(btnRegistrar)
-    //         btnRegistrar.addEventListener('click', (e) => {
-    //             tomarDatos(e);
-    //         });
-    //     } else if (opcionInventarioSeleccionada === 'consultar-pt') {
-    //         campos = ['producto-terminado'];
-    //         divDatos.classList.add('form-datos');
-    //         divDatos.innerHTML = crearFormularioNav(campos);
-    //         divPanel.appendChild(divDatos);
-    //         let tablas = document.createElement('div');
-    //         tablas.classList.add('tablas');
-    //         let tabla = document.createElement('table');
-    //         tabla.classList.add('tabla');
-    //         tabla.innerHTML = ` <tbody>
-    //         <tr>
-    //             <th>ID del Producto</th>
-    //             <th>Nombre del Producto</th>
-    //             <th>Descripción del Producto</th>
-    //             <th>Cantidad en Stock</th>
-    //             <th>Precio de Venta</th>
-    //         </tr>
-    //     </tbody>
-    // `;
-    //         tablas.appendChild(tabla);
-    //         divPanel.appendChild(tablas);
-    // } else if (opcionInventarioSeleccionada === 'entrada-pt') {
-    //     divDatos.classList.add('entrada-producto', 'formulario');
-    //     divDatos.classList.add('almacen-producto-terminado', 'formulario');
-    //     campos = ['ID_producto_terminado','cantidad',"fecha"];
-    //     divDatos.innerHTML = crearFormulario(campos);
-    //     divPanel.appendChild(divDatos);
-    // } else if (opcionInventarioSeleccionada === 'salida-pt') {
-    //     divDatos.classList.add('salida-materia', 'formulario');
-    //     campos = ['ID_producto_terminado','cantidad',"fecha","motivo"];
-    //     divDatos.innerHTML = crearFormulario(campos);
-    //     divPanel.appendChild(divDatos);
-    //     } else if (opcionInventarioSeleccionada === 'agregar-mp') {
-    //         divDatos.classList.add('almacen-mp','formulario');
-    //         campos = ["nombre","Id_proveedor","categoria","unidad_de_medida","precio_de_compra"];
-    //         divDatos.innerHTML = crearFormulario(campos);
-    //         divPanel.appendChild(divDatos);
-    //         let btnRegistrar = document.querySelector('#formulario-registro button');
-    //         console.log(btnRegistrar)
-    //         btnRegistrar.addEventListener('click', (e) => {
-    //             tomarDatos(e);
-    //         });
-    // } else if (opcionInventarioSeleccionada === 'agregar-pt') {
-    //     divDatos.classList.add('salida-materia', 'formulario');
-    //     campos = ["nombre","categoria","precio_de_venta"];
-    //     divDatos.innerHTML = crearFormulario(campos);
-    //     divPanel.appendChild(divDatos);
-    //     } else if (opcionInventarioSeleccionada === 'agregar-categoria'){
-    //         divDatos.classList.add('categoria','formulario');
-    //         divDatos.innerHTML = `<form id="formulario-registro">
-    //         <label for="nombre">Nombre de categoria: </label>
-    //         <input type="text" id="Nombre" name="Nombre" autocomplete="off">
-
-    //         <label for="tipo">Tipo: </label>
-    //         <select id="tipo">
-    //             <option value="mp">Materia prima</option>
-    //             <option value="pt">Producto terminado</option>
-    //         </select>
-
-    //         <button type="submit">Registrar</button>
-    //     </form>
-    // `;
-    //         divPanel.appendChild(divDatos);
-
-    //         let btnRegistrar = document.querySelector('#formulario-registro button');
-    //         console.log(btnRegistrar)
-    //         btnRegistrar.addEventListener('click', (e) => {
-    //             tomarDatos(e);
-    //         });
-    //     } else if (opcionInventarioSeleccionada === 'editar-categoria'){
-    //         campos = ['id-categoria'];
-    //         divDatos.classList.add('form-datos');
-    //         divDatos.innerHTML = crearFormularioNav(campos);
-    //         divPanel.appendChild(divDatos);
-    //     } else if (opcionInventarioSeleccionada === 'lista-categoria'){
-    //         let tablas = document.createElement('div');
-    //         tablas.classList.add('tablas');
-    //         let tabla = document.createElement('table');
-    //         tabla.classList.add('tabla');
-    //         tabla.innerHTML = ` <tbody>
-    //         <tr>
-    //             <th>ID Garantia</th>
-    //             <th>Nombre</th>
-    //             <th>Descripcion</th>
-    //         </tr>
-    //     </tbody>
-    // `;
-    //         tablas.appendChild(tabla);
-    //         divPanel.appendChild(tablas);
-    //     } else if (opcionInventarioSeleccionada === 'eliminar-categoria'){
-    //         campos = ['id-categoria'];
-    //         divDatos.classList.add('form-datos');
-    //         divDatos.innerHTML = crearFormularioNav(campos);
-    //         divPanel.appendChild(divDatos);
-    //     }
-
-
-    let campos, formularioHTML, tituloTabla, thTabla;
-
-    if (opcionInventarioSeleccionada === 'entrada-mp') {
-        campos = ['Id_materia_prima', 'cantidad', 'fecha'];
-    } else if (opcionInventarioSeleccionada === 'salida-mp') {
-        campos = ['Id_materia_prima', 'cantidad', 'fecha', 'motivo'];
-    } else if (opcionInventarioSeleccionada === 'agregar-mp') {
-        campos = ['nombre', 'Id_proveedor', 'categoria', 'unidad_de_medida', 'precio_de_compra'];
-    } else if (opcionInventarioSeleccionada === 'agregar-categoria') {
-        divDatos.classList.remove('formulario'); // Si es necesario, quitar la clase 'formulario' para este caso especial
-        campos = ['Nombre', 'tipo'];
-        formularioHTML = `
-        <form id="formulario-registro">
-            <label for="nombre">Nombre de categoria: </label>
-            <input type="text" id="Nombre" name="Nombre" autocomplete="off">
-
-            <label for="tipo">Tipo: </label>
-            <select id="tipo">
-                <option value="mp">Materia prima</option>
-                <option value="pt">Producto terminado</option>
-            </select>
-
-            <button type="submit">Registrar</button>
-        </form>
-    `;
-    } else if (opcionInventarioSeleccionada === 'consultar-mp') {
-        campos = ['materia-prima'];
-        tituloTabla = 'Consulta de Materias Primas';
-        thTabla = ['ID Materia Prima', 'Nombre', 'Categoria', 'Cantidad en Stock', 'Precio de Compra'];
-    } else if (opcionInventarioSeleccionada === 'consultar-pt') {
-        campos = ['producto-terminado'];
-        tituloTabla = 'Consulta de Productos Terminados';
-        thTabla = ['ID del Producto', 'Nombre del Producto', 'Descripción del Producto', 'Cantidad en Stock', 'Precio de Venta'];
-    } else if (opcionInventarioSeleccionada === 'editar-categoria') {
-        campos = ['id-categoria'];
-        tituloTabla = 'Editar Categoría';
-        thTabla = ['ID del Producto', 'Nombre del Producto', 'Descripción del Producto', 'Cantidad en Stock', 'Precio de Venta'];
-    } else if (opcionInventarioSeleccionada === 'entrada-pt') {
-        campos = ['ID_producto_terminado', 'cantidad', 'fecha'];
-    } else if (opcionInventarioSeleccionada === 'salida-pt') {
-        campos = ['ID_producto_terminado', 'cantidad', 'fecha', 'motivo'];
-    } else if (opcionInventarioSeleccionada === 'agregar-pt') {
-        campos = ['nombre', 'categoria', 'precio_de_venta'];
-    } else if (opcionInventarioSeleccionada === 'lista-categoria') {
-        tituloTabla = 'Lista de Categorías';
-        thTabla = ['ID Garantia', 'Nombre', 'Descripcion'];
-    } else if (opcionInventarioSeleccionada === 'eliminar-categoria') {
-        campos = ['id-categoria'];
+    let campos, thTabla;
+    //DEPENDIENDO QUE SUBSISTEMA ES
+    if (tipoTabla === 'materia_prima') {
+        sePuede = true;
+        if (opcionInventarioSeleccionada === "agregar_materia_prima" || opcionInventarioSeleccionada === "editar_materia_prima") {
+            campos = ["Nombre", "Id_proveedor", "Id_categoria", "Unidad_de_medida", "Precio_de_compra"];
+        }
+        if (opcionInventarioSeleccionada === 'consultar_materia_prima') {
+            thTabla = ["ID", "NOMBRE", "ID_PROVEEDOR", "PRECIO_DE_COMPRA", "ID_CATEGORIA", "UNIDAD_DE_MEDIDA"]
+        }
+        API(divDatos,campos,thTabla);
     }
 
-    if (campos) {
-        if (opcionInventarioSeleccionada === 'consultar-mp' || opcionInventarioSeleccionada === 'entrada-mp' || opcionInventarioSeleccionada === 'salida-mp') {
-            divDatos.classList.add('almacen-mp');
-        } else if (opcionInventarioSeleccionada === 'consultar-pt' || opcionInventarioSeleccionada === 'entrada-pt' || opcionInventarioSeleccionada === 'salida-pt') {
-            divDatos.classList.add('almacen-pt');
-        } else if (opcionInventarioSeleccionada === 'agregar-categoria' || opcionInventarioSeleccionada === 'editar-categoria' || opcionInventarioSeleccionada === 'eliminar-categoria' || opcionInventarioSeleccionada === 'lista-categoria') {
-            divDatos.classList.add('categoria');
+    if(tipoTabla === 'almacen_mp'){
+        if(opcionInventarioSeleccionada === 'entrada_almacen_mp'){
+            campos = ["Id_materia_prima","Cantidad"];
+        }else if(opcionInventarioSeleccionada === 'salida_almacen_mp'){
+            campos = ["Id_materia_prima","Cantidad","Motivo"];
+        }else if(opcionInventarioSeleccionada === "consultar_almacen_mp"){
+            thTabla = ["ID","ID_MATERIA_PRIMA","CANTIDAD"];
         }
-
-        if (opcionInventarioSeleccionada === 'consultar-mp' || opcionInventarioSeleccionada === 'consultar-pt' || opcionInventarioSeleccionada === 'editar-categoria' || opcionInventarioSeleccionada === 'eliminar-categoria') {
-            divDatos.innerHTML = crearFormularioNav(campos);
-            divDatos.classList.add('form-datos');
-        } else {
-            divDatos.innerHTML = crearFormulario(campos);
-            divDatos.classList.add('formulario');
-        }
-        divPanel.appendChild(divDatos);
-
-        if (formularioHTML) {
-            divDatos.innerHTML = formularioHTML;
-        }
-
-        let btnRegistrar = document.querySelector('#formulario-registro button');
-        console.log(btnRegistrar);
-        btnRegistrar.addEventListener('click', (e) => {
-            tomarDatos(e);
-        });
-    } else {
-        // Manejar caso no contemplado
+        API(divDatos,campos,thTabla);
     }
 
+    if(tipoTabla === 'producto_terminado'){
+        if(opcionInventarioSeleccionada === 'agregar_producto_terminado' || opcionInventarioSeleccionada === 'editar_producto_terminado'){
+            campos = ["Nombre","Id_categoria","Precio_venta"];
+        }else if(opcionInventarioSeleccionada === 'consultar_producto_terminado'){
+            thTabla = ["ID","NOMBRE","ID_CATEGORIA","PRECIO_VENTA"]
+        }
+        API(divDatos,campos,thTabla)
+    }
+    //CATEGORIA ES LO UNICO
+    if (tipoTabla === 'categoria') {
+        if (opcionInventarioSeleccionada === 'agregar_categoria') {
+            campos = ["Nombre", "Tipo"];
+            API(divDatos,campos,thTabla);
+        }
+        if (opcionInventarioSeleccionada === 'consultar_categoria') {
+            thTabla = ["ID", "NOMBRE"];
+        }
+        if (opcionInventarioSeleccionada === 'editar_categoria' || opcionInventarioSeleccionada === 'consultar_categoria' || opcionInventarioSeleccionada === 'eliminar_categoria') {
+            let div = document.createElement('div');
+            div.classList.add('form-datos');
+            let camposAux = ["Tipo_categoria"];
+            div.innerHTML = crearFormularioNav(camposAux);
+            divPanel.append(div);
+            let btnRegistrar = document.querySelector('.form input[type="submit"]');
+            if(opcionInventarioSeleccionada === 'editar_categoria'){
+            campos = ["Nombre"];
+                btnRegistrar.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const tipoCategoriaSelect = document.getElementById('Tipo_categoria');
+                    tipoTabla += tipoCategoriaSelect.value;
+                    limpiarHtml();
+                    API(divDatos,campos,thTabla);
+                })
+            }else{
+                btnRegistrar.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const tipoCategoriaSelect = document.getElementById('Tipo_categoria');
+                    tipoTabla += tipoCategoriaSelect.value;
+                    limpiarHtml();
+                    API(divDatos,campos,thTabla);
+                    
+                })
+            }
+        }
+    }
 
 }
 
-function tomarDatos(e) {
+async function API(divDatos, campos, thTabla){
+    if (accionTabla === "eliminar") {
+        let div = document.createElement('div');
+        div.classList.add('form-datos');
+        let camposAux = ["Id_" + tipoTabla];
+        div.innerHTML = crearFormularioNav(camposAux);
+        divPanel.append(div);
+        let btnRegistrar = document.querySelector('.form input[type="submit"]');
+        btnRegistrar.addEventListener('click', (e) => {
+            e.preventDefault();
+            const id = document.querySelector('.form input[type="text"]');
+            limpiarHtml();
+            eliminarDatosId(tipoTabla, id.value);
+        })
+    } else if (accionTabla === "consultar") {
+        let datos = await obtenerDatos(tipoTabla);
+        divPanel.append(divDatos);
+        divPanel.append(await construirTabla(datos, thTabla));
+        $('.tabla').DataTable({
+            lengthChange: false,
+            info: false,
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json"
+            }, "pageLength": 7
+        });
+    } else if (accionTabla === "editar") {
+        let div = document.createElement('div');
+        div.classList.add('form-datos');
+        let camposAux = ["Id_" + tipoTabla];
+        div.innerHTML = crearFormularioNav(camposAux);
+        divPanel.append(div);
+        let btnRegistrar = document.querySelector('.form input[type="submit"]');
+        btnRegistrar.addEventListener('click', (e) => {
+            const id = document.querySelector('.form input[type="text"]');
+            limpiarHtml();
+            edicionDatos(e, campos, id.value);
+        })
+    } else {
+        crearFormulario(campos)
+            .then(formularioHTML => {
+                console.log(divDatos);
+                divDatos.innerHTML = formularioHTML;
+                console.log(formularioHTML);
+                divDatos.classList.add('formulario');
+
+                // Agregar un manejador de eventos al formulario solo si hay un formulario HTML
+                let btnRegistrar = divDatos.querySelector('#formulario-registro button');
+                if (btnRegistrar) {
+                    btnRegistrar.addEventListener('click', (e) => {
+                        e.preventDefault();  // Prevenir el envío por defecto del formulario
+                        tomarDatos(e);
+                    });
+                }
+                divPanel.append(divDatos);
+            })
+            .catch(error => {
+                console.error('Error al crear el formulario:', error);
+            });
+    }
+}
+
+async function edicionDatos(e, campos, id) {
     e.preventDefault();
-    // Obtener los valores del formula
-    const form = document.querySelector("#formulario-registro");
+    llenarFormulario(campos, id);
+}
 
-    let tipoTabla = form.parentElement.classList[0];
+async function llenarFormulario(campos, id) {
+    try {
+        const datos = await obtenerDatosId(tipoTabla, id);
+        console.log(datos);
 
-    if (tipoTabla === 'categoria') {
-        if (opcionInventarioSeleccionada === 'agregar-categoria') {
-            tipoTabla += "_" + document.querySelector("#formulario-registro #tipo").value;
-            console.log(tipoTabla)
+
+
+        const formularioHTML = await crearFormularioLlenado(campos, datos);
+
+        let divDatos = document.createElement('div');
+        divDatos.innerHTML = formularioHTML;
+        divDatos.classList.add('formulario');
+
+        let btnRegistrar = divDatos.querySelector('#formulario-registro button');
+
+        if (btnRegistrar) {
+            btnRegistrar.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try {
+                    // Maneja la promesa devuelta por actualizarDatos
+
+                    let form = document.querySelector("#formulario-registro");
+                    await actualizarDatos(form, tipoTabla, id);
+                    console.log('Datos actualizados con éxito');
+                } catch (error) {
+                    console.error('Error al actualizar datos:', error);
+                }
+            });
         }
-    } else if (tipoTabla === 'almacen-mp') {
-        if (opcionInventarioSeleccionada !== 'agregar-mp') {
-            console.log(tipoTabla);
+
+        divPanel.append(divDatos);
+    } catch (error) {
+        console.error('Error al llenar el formulario:', error);
+    }
+}
+
+
+
+async function crearFormularioLlenado(campos, datos) {
+    let formulario = `<form id="formulario-registro">`;
+
+
+    for (const campo of campos) {
+        const textoLabel = formatText(campo);
+
+        formulario += `<label for="${campo}">${textoLabel}</label>`;
+
+        let posicion = campo.toUpperCase();
+
+
+        if (campo === 'fecha') {
+            formulario += `<input type="date" name="${campo}" id="${campo}" value="${datos[posicion] || ''}">`;
+        } else if (campo === 'Tipo') {
+            const opciones = [["_mp", "Materia prima"], ["_pt", "Producto terminado"]];
+            
+            formulario += generateSelectField(campo, opciones,  tipoTabla);
+        } else if (campo === 'Unidad_de_medida') {
+            const opciones = [['Gramos', 'Gramos'], ['Pieza', 'Pieza']];
+            formulario += generateSelectField(campo, opciones, datos[posicion]);
+        } else if (campo === 'Id_proveedor' || campo === 'Id_categoria') {
+            //AQUI ES CUANDO QUIERO CONSEGUIR LOS ELEMENTOS DEL SELECT DEPENDIENDO QUE TABLA SEA
+            let tabla;
+            if (campo === 'Id_proveedor') {
+                tabla = 'proveedor';
+            } else if (campo === 'Id_categoria') {
+                tabla = opcionInventarioSeleccionada === 'editar_materia_prima' ? 'categoria_mp' : 'categoria_pt';
+            }
+
+            try {
+                const datosSelect = await obtenerDatos(tabla);
+                console.log(datosSelect)
+                const selectHTML = generateSelectField(campo, datosSelect, datos[posicion]);
+                formulario += selectHTML;
+            } catch (error) {
+                console.error(`Error al obtener datos de ${tabla}:`, error);
+            }
         } else {
-            tipoTabla = 'materia_prima';
-            console.log(tipoTabla);
+            formulario += `<input type="text" name="${campo}" id="${campo}" value="${datos[posicion] || ''}">`;
         }
     }
 
+    formulario += '<button type="submit">Registrar</button></form>';
+    return formulario;
+}
 
+
+async function tomarDatos(e) {
+    e.preventDefault();
+    const form = document.querySelector("#formulario-registro");
+    let hola = ponerDatos(form, tipoTabla);
+    console.log(hola);
+    agregarModal(hola);
+}
+
+
+
+function actualizarDatos(form, tipoTabla, id) {
+    return new Promise((resolve, reject) => {
+
+        console.log(form);
+
+        const form_data = new FormData(form);
+        const data = new URLSearchParams(form_data);
+
+        form_data.forEach((valor, clave) => {
+            console.log(`${clave}: ${valor}`);
+        });
+
+        fetch(`http://localhost:3000/${tipoTabla}/${id}`, {
+            method: 'PUT',
+            body: data,
+        })
+            .then(async response => {
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`Error en la solicitud: ${response.status} - ${JSON.stringify(errorData)}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Resolver la promesa con los datos actualizados
+                resolve(data);
+            })
+            .catch(error => {
+                // Rechazar la promesa en caso de error
+                reject(error);
+            });
+    });
+}
+
+
+function obtenerDatosId(tipoTabla, id) {
+    return new Promise((resolve, reject) => {
+        // Realizar una solicitud GET a la API con el ID proporcionado
+        fetch(`http://localhost:3000/${tipoTabla}/${id}`, {
+            method: 'GET',
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Error en la solicitud: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Resolver la promesa con los datos obtenidos
+                console.log(data)
+                resolve(data);
+            })
+            .catch(error => {
+                // Rechazar la promesa en caso de error
+                reject(error);
+            });
+    });
+}
+
+function eliminarDatosId(tipoTabla, id) {
+    console.log(tipoTabla)
+    return new Promise((resolve, reject) => {
+        // Realizar una solicitud DELETE a la API con el ID proporcionado
+        fetch(`http://localhost:3000/${tipoTabla}/${id}`, {
+            method: 'DELETE',
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Error en la solicitud: ${response.status}`);
+                }
+                // La operación DELETE puede no devolver datos, pero puedes devolver un mensaje o algo relevante
+                //return response.json();
+            })
+            .then(data => {
+                // Resolver la promesa con los datos obtenidos (o mensaje)
+                console.log(data);
+                resolve(data);
+            })
+            .catch(error => {
+                // Rechazar la promesa en caso de error
+                reject(error);
+            });
+    });
+}
+
+
+function obtenerDatos(tipoTabla) {
+    return new Promise((resolve, reject) => {
+        const arregloDatos = [];
+
+        // Realizar una solicitud GET a la API
+        fetch(`http://localhost:3000/${tipoTabla}`, {
+            method: 'GET',
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Error en la solicitud: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                data.forEach(item => {
+                    if (accionTabla === 'consultar') {
+                        arregloDatos.push(item);
+                    } else {
+                        const cadena = `${item.NOMBRE}`;
+                        arregloDatos.push([item.ID, cadena]);
+                    }
+                });
+                resolve(arregloDatos);
+            })
+            .catch(error => {
+                // Rechazar la promesa en caso de error
+                reject(error);
+            });
+    });
+}
+
+
+function ponerDatos(form, tipoTabla) {
     const form_data = new FormData(form);
     const data = new URLSearchParams(form_data);
 
+
     form_data.forEach((valor, clave) => {
-        console.log(`${clave}: ${valor}`);
+        console.log(valor)
+        if (clave === 'Tipo') {
+            tipoTabla += valor;
+        }
     });
 
-    fetch(`http://localhost:3000/tipoTabla`, {
+    const camposExcluidos = ['Tipo'];
+
+    camposExcluidos.forEach(campo => {
+        form_data.delete(campo);
+    });
+
+    console.log(tipoTabla);
+
+    fetch(`http://localhost:3000/${tipoTabla}`, {
         method: 'POST',
         body: data
-    }).then(res => res.json())
-        .then(data => console.log(data))
-        .catch(error => console.log(error));
-
-    agregarModal();
+    })
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`Error en la solicitud: ${res.status} - ${res.statusText}`);
+            }
+            return res.json();
+        })
+        .then(data => {
+            console.log(data);
+            return data;
+        })
+        .catch(error => {
+            console.error(error); // Agregar esta línea para ver el error en la consola
+        });
 }
 
-function agregarModal() {
+
+function agregarModal(id) {
     // Crear el modal
     const modal = document.createElement('div');
     modal.classList.add('modal');
-
+    console.log(id);
     modal.innerHTML = `
         <div class="modal-content">
-            <p>Se han guardado correctamente los cambios<br>La materia prima tendra el ID 1</p>
+            <p>Se han guardado correctamente los cambios<br>La materia prima tendra el ID ${id}</p>
             <button>Cerrar</button>
         </div>
     `;
@@ -389,11 +561,15 @@ function agregarModal() {
 
 function crearFormularioNav(campos) {
     let formulario = '<form action="" class="form">';
-
     campos.forEach(campo => {
+        let titulo = formatText(campo);
+        let input = `<input type="text" name="${campo}" id="${campo}" class=""></input>`
+        if (tipoTabla === 'categoria') {
+            input = generateSelectField(campo, [['_mp', 'Materia prima'], ['_pt', 'Producto terminado']])
+        }
         formulario += `
-        <label for="${campo}">${campo.charAt(0).toUpperCase() + campo.slice(1)}</label>
-        <input type="text" name="${campo}" id="${campo}" class="">
+        <label for="${campo}">${titulo}</label>
+        ${input}
         <input type="submit" name="${campo}" id="${campo}" value="Buscar" class="producto">`;
     });
 
@@ -401,21 +577,125 @@ function crearFormularioNav(campos) {
     return formulario;
 }
 
-function crearFormulario(campos) {
-    let formulario = '<form action="" id="formulario-registro">';
+async function crearFormulario(campos) {
+    let formulario = `<form id="formulario-registro">`;
 
-    campos.forEach(campo => {
-        let textoLabel = campo.replace(/_/g, ' ');
-        formulario += `
-        <label for="${campo}">${textoLabel.charAt(0).toUpperCase() + textoLabel.slice(1)}</label>`;
+    for (const campo of campos) {
+        const textoLabel = formatText(campo);
+
+        formulario += `<label for="${campo}">${textoLabel}</label>`;
+
         if (campo === 'fecha') {
             formulario += `<input type="date" name="${campo}" id="${campo}">`;
+        } else if (campo === 'Tipo') {
+            formulario += generateSelectField(campo, [["_mp", "Materia prima"], ["_pt", "Producto terminado"]]);
+        } else if (campo === 'Unidad_de_medida') {
+            formulario += generateSelectField(campo, [['Gramos', 'Gramos'], ['Pieza', 'Pieza']]);
+        } else if (campo === 'Id_proveedor' || campo === 'Id_categoria' || campo === "Id_materia_prima") {
+            let tabla;
+            if (campo === 'Id_proveedor') {
+                tabla = 'proveedor';
+            } else if (campo === 'Id_categoria') {
+                if (opcionInventarioSeleccionada === 'agregar_materia_prima') {
+                    tabla = 'categoria_mp';
+                } else {
+                    tabla = 'categoria_pt';
+                }
+            }else if(campo === 'Id_materia_prima'){
+                tabla = 'materia_prima';
+            }
+
+            try {
+                const datosSelect = await obtenerDatos(tabla);
+                const selectHTML = generateSelectField(campo, datosSelect);
+                formulario += selectHTML;
+            } catch (error) {
+                console.error(`Error al obtener datos de ${tabla}:`, error);
+            }
         } else {
             formulario += `<input type="text" name="${campo}" id="${campo}">`;
         }
-
-    });
+    }
 
     formulario += '<button type="submit">Registrar</button></form>';
     return formulario;
+}
+
+
+
+
+function formatText(text) {
+    // Paso 1: Reemplazar guiones bajos con espacios
+    let formattedText = text.replace(/_/g, ' ');
+
+    // Paso 2: Capitalizar la primera letra
+    formattedText = formattedText.charAt(0).toUpperCase() + formattedText.slice(1);
+
+    return formattedText;
+}
+
+// Función para generar el HTML de un campo de selección
+function generateSelectField(fieldName, options, selectedValue) {
+    let selectHTML = `<select id="${fieldName}" name="${fieldName}">
+        <option value="" disabled selected>Selecciona uno</option>`;
+
+    if(selectedValue === 'categoria_mp'){
+        selectedValue = "_mp";
+    }else if(selectedValue === 'categoria_pt'){
+        selectedValue = "_pt";
+    }
+
+    console.log(selectedValue)
+
+    for (const option of options) {
+        selectHTML += `<option value="${option[0]}" ${selectedValue === option[0] ? 'selected' : ''}>${option[1]}</option>`;
+    }
+
+    selectHTML += '</select>';
+    return selectHTML;
+}
+
+async function construirTabla(datos, thTabla) {
+    const div = document.createElement('div');
+    div.classList.add('tablas');
+    const tabla = document.createElement('table');
+    tabla.classList.add('tabla');
+    // Encabezado de la tabla
+    const thead = document.createElement('thead');
+    const trHead = document.createElement('tr');
+    thTabla.forEach((thText) => {
+        const th = document.createElement('th');
+        th.textContent = thText;
+        trHead.appendChild(th);
+    });
+    thead.appendChild(trHead);
+    tabla.appendChild(thead);
+
+    // Cuerpo de la tabla
+    const tbody = document.createElement('tbody');
+
+    if (datos && datos.length > 0) {
+        datos.forEach((fila) => {
+            const tr = document.createElement('tr');
+            thTabla.forEach((columna) => {
+                const td = document.createElement('td');
+                td.textContent = fila[columna];  // Utilizar directamente la columna como clave
+                tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+        });
+    } else {
+        // Crear una fila de "sin datos" si no hay datos
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.textContent = 'Sin datos disponibles';
+        td.colSpan = thTabla.length;
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+    }
+
+    tabla.appendChild(tbody);
+    div.append(tabla);
+    // Limpiar y añadir la tabla al contenedor
+    return div;
 }

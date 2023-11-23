@@ -38,62 +38,73 @@ function pintarHtml() {
     let divDatos = document.createElement('div');
     limpiarHtml();
     if (opcionProveedoresSeleccionada === 'registrar-proveedores') {
-        campos = ["representante", "nombre", "RFC", "correo_electronico", "telefono", "celular", "domicilio", "numero_exterior", "codigo_postal", "colonia", "ciudad", "estado", "limite_de_credito", "dias_de_credito"];
+        campos = ["Nombre","Representante", "RFC", "Correo_electronico", "Celular", "Numero_exterior", "Codigo_postal", "Ciudad", "Estado", "Limite_de_credito", "Dias_de_credito", "Domicilio"];
         divDatos.classList.add('formulario', 'registrar-proveedores');
         divDatos.innerHTML = crearFormulario(campos, "formulario-registro");
         divPanel.appendChild(divDatos);
-    } else {
-        let aux = document.createElement('div');
-        if (opcionProveedoresSeleccionada === 'historial-proveedores') {
-
-        }
-        campos = ['nombre-proveedor'];
-        divDatos.classList.add('form-datos');
-        divDatos.innerHTML = crearFormulario(campos, "");
-        divPanel.appendChild(divDatos);
-        let tablas = document.createElement('div');
-        tablas.classList.add('tablas');
-        let tabla = document.createElement('table');
-        tabla.classList.add('tabla');
-        tabla.innerHTML = ` <tbody>
-        <tr>
-            <th>ID del Producto</th>
-            <th>Nombre del Producto</th>
-            <th>Descripción del Producto</th>
-            <th>Cantidad en Stock</th>
-            <th>Precio de Venta</th>
-        </tr>
-        <tr>
-            <td>001</td>
-            <td>01/11/2023</td>
-            <td>C001</td>
-            <td>Juan Pérez</td>
-            <td>Anillo</td>
-        </tr>
-        <!-- Agrega más filas según sea necesario -->
-    </tbody>
-    
-`;
-        tablas.appendChild(tabla);
-        divPanel.appendChild(tablas);
-        divPanel.appendChild(aux);
     }
+
+
+    let btnRegistrar = document.querySelector('#formulario-registro button');
+    console.log(btnRegistrar);
+    btnRegistrar.addEventListener('click', (e) => {
+        tomarDatos(e);
+    });
+
+}
+
+function tomarDatos(e) {
+    e.preventDefault();
+    const form = document.querySelector("#formulario-registro");
+
+    const form_data = new FormData(form);
+    const data = new URLSearchParams(form_data);
+
+    form_data.forEach((valor, clave) => {
+        console.log(`${clave}: ${valor}`);
+    });
+
+
+    fetch(`http://localhost:3000/proveedor`, {
+        method: 'POST',
+        body: data
+    }).then(res => res.json())
+        .then(data => console.log(data))
+        .catch(error => console.log(error));
+
 }
 
 
-function crearFormulario(campos, clase) {
-    let formulario = `<form action="" class="${clase}">`;
+
+function crearFormularioNav(campos) {
+    let formulario = '<form action="" class="form">';
 
     campos.forEach(campo => {
-
-        let textoLabel = campo.replace(/_/g, ' ');
         formulario += `
-        <div class="campo">
-            <label for="${campo}">${textoLabel.charAt(0).toUpperCase() + textoLabel.slice(1)}</label>
-            <input type="text" name="${campo}" id="${campo}">
-        </div>`;
+        <label for="${campo}">${campo.charAt(0).toUpperCase() + campo.slice(1)}</label>
+        <input type="text" name="${campo}" id="${campo}" class="">
+        <input type="submit" name="${campo}" id="${campo}" value="Buscar" class="producto">`;
     });
 
     formulario += '</form>';
+    return formulario;
+}
+
+function crearFormulario(campos) {
+    let formulario = '<form action="" id="formulario-registro">';
+
+    campos.forEach(campo => {
+        let textoLabel = campo.replace(/_/g, ' ');
+        formulario += `
+        <label for="${campo}">${textoLabel.charAt(0).toUpperCase() + textoLabel.slice(1)}</label>`;
+        if (campo === 'Limite_de_credito' || campo === 'Dias_de_credito') {
+            formulario += `<input type="number" name="${campo}" id="${campo}">`;
+        } else {
+            formulario += `<input type="text" name="${campo}" id="${campo}">`;
+        }
+
+    });
+
+    formulario += '<button type="submit">Registrar</button></form>';
     return formulario;
 }

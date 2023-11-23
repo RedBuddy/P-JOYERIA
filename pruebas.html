@@ -1,51 +1,100 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="css.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autocompletado de productos por nombre o categoría</title>
+  <style>
+    /* Agrega algún estilo según tus preferencias */
+    #searchInput {
+      padding: 10px;
+      margin: 10px;
+    }
+
+    #productList {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+      position: absolute;
+      border: 1px solid #ccc;
+      background-color: #fff;
+      max-height: 150px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    #productList li {
+      cursor: pointer;
+      padding: 5px;
+    }
+  </style>
 </head>
 <body>
-    <section class="contenedor">
-        <!-- Contenedor de elementos -->
-        <div class="contenedor-items">
-            <div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div><div class="item">
-            </div>
-        </div>
-        </section>  
+
+<!-- Input donde el usuario escribirá la categoría o el nombre del producto -->
+<input type="text" id="searchInput" oninput="autocompletarProductos()" placeholder="Escribe una categoría o nombre de producto...">
+
+<!-- Lista de productos autocompletados -->
+<ul id="productList"></ul>
+
+<!-- Script JavaScript para el autocompletado -->
+<script>
+  function autocompletarProductos() {
+    // Obtén el valor del input de búsqueda
+    var searchInput = document.getElementById("Id_producto_terminado");
+    var term = searchInput.value.toLowerCase(); // Suponemos que la búsqueda es sensible a mayúsculas/minúsculas
+
+    // Aquí podrías realizar una solicitud al servidor para obtener los productos
+    // En este ejemplo, utilizamos un array simulado de productos
+    var productos = [
+      { id: 1, nombre: "Producto A", categoria: "categoria1" },
+      { id: 2, nombre: "Producto B", categoria: "categoria2" },
+      { id: 3, nombre: "Producto C", categoria: "categoria1" },
+      // Agrega más productos según sea necesario
+    ];
+
+    // Filtra los productos por coincidencia en el nombre o categoría
+    var productosFiltrados = productos.filter(function(producto) {
+      return producto.nombre.toLowerCase().includes(term) || producto.categoria.toLowerCase().includes(term);
+    });
+
+    // Muestra los productos en la lista
+    mostrarProductos(productosFiltrados);
+  }
+
+  function mostrarProductos(productos) {
+    var lista = document.getElementById("productList");
+    lista.innerHTML = ""; // Limpiar la lista antes de agregar nuevos elementos
+
+    productos.forEach(function(producto) {
+      var item = document.createElement("li");
+      item.textContent = producto.nombre + " (ID: " + producto.id + ", Categoría: " + producto.categoria + ")";
+      item.setAttribute("data-id", producto.id); // Agrega el ID del producto como atributo de datos
+      item.addEventListener("click", seleccionarProducto);
+      lista.appendChild(item);
+    });
+
+    // Muestra la lista debajo del input
+    lista.style.display = productos.length > 0 ? "block" : "none";
+  }
+
+  function seleccionarProducto(event) {
+    var selectedProductId = event.currentTarget.getAttribute("data-id");
+    // Haz lo que necesites con el ID del producto seleccionado
+    alert("Producto seleccionado con ID: " + selectedProductId);
+    // Oculta la lista después de seleccionar un producto
+    document.getElementById("productList").style.display = "none";
+  }
+
+  // Oculta la lista si se hace clic fuera del input y la lista
+  document.addEventListener("click", function (event) {
+    var productList = document.getElementById("productList");
+    if (event.target !== productList && event.target !== document.getElementById("searchInput")) {
+      productList.style.display = "none";
+    }
+  });
+
+</script>
+
 </body>
 </html>
