@@ -35,3 +35,28 @@
     padding: 0;
     list-style: none;
 }
+
+@mixin style-boton($color) {
+    background-color: $color;
+    color: #fff;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: .4rem;
+    cursor: pointer;
+}
+
+@mixin style-boton-barra($color) {
+    background-color: $color;
+    color: #fff;
+    border: none;
+    padding: .4rem;
+    border-radius: .4rem;
+    cursor: pointer;
+    font-weight: lighter;
+}
+
+@mixin style-input-barra {
+    padding: .4rem;
+    border-radius: .4rem;
+    border-style: none;
+}
