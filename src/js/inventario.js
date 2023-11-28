@@ -44,8 +44,7 @@ function generarNav(opcion) {
     if (opcion === 'almacen_mp' || opcion === 'almacen_pt') {
         return `
         <a class="nav-sup-link consultar_${opcion}" href="#"><img src="../src/img/almacen.png" alt="" class="consultar_${opcion}">Consultar almacen</a>
-        <a class="nav-sup-link entrada_${opcion}" href="#"><img src="../src/img/entrada.png" alt="" class="entrada_${opcion}">Registrar entrada</a>
-        <a class="nav-sup-link salida_${opcion}" href="#"><img src="../src/img/salida.png" alt="" class="salida_${opcion}">Registrar salida</a>
+        <a class="nav-sup-link movimiento_${opcion}" href="#"><img src="../src/img/entrada.png" alt="" class="movimiento_${opcion}">Registrar movimiento</a>
         `;
     }
     titulo = formatText(opcion).toLowerCase();
@@ -77,22 +76,16 @@ function agregarEventListeners() {
                 opcionInventarioSeleccionada = 'consultar_almacen_mp';
                 //ME INDICA QUE VA HACER LA API
                 accionTabla = "consultar";
-            } else if (opcionSeleccionada.contains('entrada_almacen_mp')) {
-                opcionInventarioSeleccionada = 'entrada_almacen_mp';
+            } else if (opcionSeleccionada.contains('movimiento_almacen_mp')) {
+                opcionInventarioSeleccionada = 'movimiento_almacen_mp';
                 accionTabla = "agregar";
-            } else if (opcionSeleccionada.contains('salida_almacen_mp')) {
-                opcionInventarioSeleccionada = 'salida_almacen_mp';
-                accionTabla = "editar";
             } else if (opcionSeleccionada.contains('consultar_almacen_pt')) {
                 opcionInventarioSeleccionada = 'consultar_almacen_pt';
                 accionTabla = "consultar";
-            } else if (opcionSeleccionada.contains('entrada_almacen_pt')) {
-                opcionInventarioSeleccionada = 'entrada_almacen_pt';
+            } else if (opcionSeleccionada.contains('movimiento_almacen_pt')) {
+                opcionInventarioSeleccionada = 'movimiento_almacen_pt';
                 accionTabla = "agregar";
-            } else if (opcionSeleccionada.contains('salida_almacen_pt')) {
-                opcionInventarioSeleccionada = 'salida_almacen_pt';
-                accionTabla = "editar";
-            } else if (opcionSeleccionada.contains('agregar_materia_prima')) {
+            }  else if (opcionSeleccionada.contains('agregar_materia_prima')) {
                 opcionInventarioSeleccionada = 'agregar_materia_prima';
                 accionTabla = "agregar";
             } else if (opcionSeleccionada.contains('agregar_categoria')) {
@@ -156,12 +149,19 @@ function pintarHtml() {
     }
 
     if(tipoTabla === 'almacen_mp'){
-        if(opcionInventarioSeleccionada === 'entrada_almacen_mp'){
-            campos = ["Id_materia_prima","Cantidad"];
-        }else if(opcionInventarioSeleccionada === 'salida_almacen_mp'){
-            campos = ["Id_materia_prima","Cantidad","Motivo"];
+        if(opcionInventarioSeleccionada === 'movimiento_almacen_mp'){
+            campos = ["Id_materia_prima","Cantidad","Tipo_movimiento","Motivo"];
         }else if(opcionInventarioSeleccionada === "consultar_almacen_mp"){
-            thTabla = ["ID","ID_MATERIA_PRIMA","CANTIDAD"];
+            thTabla = ["ID_MATERIA_PRIMA","CANTIDAD"];
+        }
+        API(divDatos,campos,thTabla);
+    }
+
+    if(tipoTabla === 'almacen_pt'){
+        if(opcionInventarioSeleccionada === 'movimiento_almacen_pt'){
+            campos = ["Id_producto","Cantidad","Tipo_movimiento","Motivo"];
+        }else if(opcionInventarioSeleccionada === "consultar_almacen_pt"){
+            thTabla = ["ID_PRODUCTO","CANTIDAD"];
         }
         API(divDatos,campos,thTabla);
     }
@@ -499,15 +499,20 @@ function ponerDatos(form, tipoTabla) {
     const form_data = new FormData(form);
     const data = new URLSearchParams(form_data);
 
+    console.log(data);
 
-    form_data.forEach((valor, clave) => {
-        console.log(valor)
-        if (clave === 'Tipo') {
-            tipoTabla += valor;
-        }
-    });
+    if(tipoTabla === 'almacen_mp' && accionTabla === 'agregar'){
+        tipoTabla = 'actualizar_almacen';
+    }else if(tipoTabla === 'almacen_pt' && accionTabla === 'agregar'){
+        tipoTabla = 'actualizar_almacen_pt';
+    }
 
     const camposExcluidos = ['Tipo'];
+
+    form_data.forEach((value, key) => {
+        console.log(`Clave: ${key}, Valor: ${value}`);
+      });
+
 
     camposExcluidos.forEach(campo => {
         form_data.delete(campo);
@@ -580,8 +585,14 @@ function crearFormularioNav(campos) {
 async function crearFormulario(campos) {
     let formulario = `<form id="formulario-registro">`;
 
-    for (const campo of campos) {
+    for (let campo of campos) {
         const textoLabel = formatText(campo);
+
+        if(tipoTabla === 'almacen_mp' && campo === 'Id_materia_prima' && accionTabla === 'agregar'){
+            campo = "ID_MP";
+        }else if(tipoTabla === 'almacen_pt' && campo === 'Id_producto' && accionTabla === 'agregar'){
+            campo = "ID_PT";
+        }
 
         formulario += `<label for="${campo}">${textoLabel}</label>`;
 
@@ -589,9 +600,12 @@ async function crearFormulario(campos) {
             formulario += `<input type="date" name="${campo}" id="${campo}">`;
         } else if (campo === 'Tipo') {
             formulario += generateSelectField(campo, [["_mp", "Materia prima"], ["_pt", "Producto terminado"]]);
+        }else if (campo === 'Tipo_movimiento') {
+            const opciones = [["ENTRADA", "Entrada"], ["SALIDA", "Salida"]];
+            formulario += generateSelectField(campo, opciones,  tipoTabla);
         } else if (campo === 'Unidad_de_medida') {
             formulario += generateSelectField(campo, [['Gramos', 'Gramos'], ['Pieza', 'Pieza']]);
-        } else if (campo === 'Id_proveedor' || campo === 'Id_categoria' || campo === "Id_materia_prima") {
+        } else if (campo === 'Id_proveedor' || campo === 'Id_categoria' || campo === "ID_MP" || campo === 'Id_materia_prima' || campo === 'ID_PT' || campo === 'Id_producto') {
             let tabla;
             if (campo === 'Id_proveedor') {
                 tabla = 'proveedor';
@@ -601,8 +615,12 @@ async function crearFormulario(campos) {
                 } else {
                     tabla = 'categoria_pt';
                 }
-            }else if(campo === 'Id_materia_prima'){
+            }else if(campo === 'ID_MP'){
                 tabla = 'materia_prima';
+                campo = 'Id_materia_prima';
+            }else if(campo === 'ID_PT'){
+                tabla = 'producto_terminado';
+                campo = 'Id_producto';    
             }
 
             try {
@@ -636,6 +654,11 @@ function formatText(text) {
 
 // Función para generar el HTML de un campo de selección
 function generateSelectField(fieldName, options, selectedValue) {
+    if(fieldName === 'Id_materia_prima' && tipoTabla === 'almacen_mp' && accionTabla === 'agregar'){
+        fieldName = 'Id_mp';
+    }else if(fieldName === 'Id_producto' && tipoTabla === 'almacen_pt' && accionTabla === 'agregar'){
+        fieldName = 'Id_pt';
+    }
     let selectHTML = `<select id="${fieldName}" name="${fieldName}">
         <option value="" disabled selected>Selecciona uno</option>`;
 

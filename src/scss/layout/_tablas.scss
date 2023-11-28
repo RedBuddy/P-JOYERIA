@@ -1,12 +1,10 @@
 .tablas {
   display: flex;
   justify-content: center;
-  flex-direction: column;
   align-items: center;
   margin-top: 5rem;
 
   .tabla {
-    border-collapse: collapse;
     margin: 5rem 5rem 0;
 
     th,
@@ -47,5 +45,15 @@
   .dataTables_filters label{
     font-size: 2rem;
   }
+}
+
+.tablas .tabla .eliminar {
+  width: 10px;
+  cursor: pointer;
+}
+
+.tablas .tabla .agregar {
+  width: 10px;
+  cursor: pointer;
 }
 
