@@ -4,6 +4,15 @@ let opcionVentaSeleccionada;
 let tipoTabla;
 let accionTabla;
 
+// ///
+// const registrar_cliente = document.createElement('div');
+// registrar_cliente.classList.add('registrar-cliente');
+// registrar_cliente.innerHTML = `<h1>${nivel_acceso}</h1>`;
+
+
+// divPanel.appendChild(registrar_cliente);
+// ///
+
 let productosVentasAcumuladas = [];
 
 opcionesVenta.forEach((opcion) => {
@@ -180,3 +189,9 @@ document.addEventListener("click", function (event) {
     productListRegistrarVenta.style.display = "none";
   }
 });
+
+// En otro módulo HTML
+const nivel_acceso = localStorage.getItem('nivel_acceso');
+
+// Utilizar el nivel de acceso como sea necesario
+console.log("Nivel de acceso:", nivel_acceso);
