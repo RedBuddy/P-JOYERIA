@@ -7,8 +7,8 @@
     <title>Software Joyería</title>
 
     <!-- Preloads -->
-    <link rel="preload" href="build/css/app.css" as="style">
-    <link rel="stylesheet" href="build/css/app.css">
+    <link rel="preload" href="../build/css/loggin.css" as="style">
+    <link rel="stylesheet" href="../build/css/loggin.css">
     <script src="https://kit.fontawesome.com/9834f61985.js" crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +17,16 @@
 </head>
 
 <body>
-    <div class="contenedor">
+
+    <div class="logo">
+        <a href="#" class="nav-logo">
+            <img src="../build/img/diamante.avif" alt="imagen">
+            <h1>Joyería</h1>
+        </a>
+    </div>
+
+
+    <div class="contenedor-loggin">
         <form action="" class="formulario-login">
             <h1 class="title">Bienvenido</h1>
             <label>
@@ -28,7 +37,7 @@
                 <i class="fa-solid fa-lock"></i>
                 <input placeholder="Contraseña" type="password" name="password" id="password">
             </label>
-        <button id="button">Ingresar</button>
+            <button class="button-log" type="submit">Ingresar</button>
         </form>
     </div>
 </body>
