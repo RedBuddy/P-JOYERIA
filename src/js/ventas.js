@@ -17,13 +17,14 @@ opcionesVenta.forEach((opcion) => {
       opcionVentaSeleccionada = 'registrar_venta';
       accionTabla = 'agregar';
       tipoTabla = 'producto_terminado';
-    } else if (opcionSeleccionada.contains('registrar_abono')) {
-      opcionVentaSeleccionada = 'registrar_abono';
-      accionTabla = 'consultar';//primero consultar para mostrar la tabla, y despues agregar, para el abono
     } else if (opcionSeleccionada.contains('historial_venta')) {
       opcionVentaSeleccionada = 'historial_venta';
       tipoTabla = 'venta';
       accionTabla = 'consultar';
+    } else if(opcionSeleccionada.contains('registrar_abono')){
+      opcionVentaSeleccionada = 'registrar_abono';
+      tipoTabla = 'venta';
+      accionTabla = 'agregar';
     }
     pintarHtml();
   });
@@ -41,11 +42,15 @@ function pintarHtml() {
     campos = ["Tipo_venta"];
     thTabla = ["ID", "FECHA_DE_VENTA", "MONTO_TOTAL", "MONTO_PAGADO", "ESTATUS", "NUMERO_MENSUALIDADES", "MONTO_MENSUALIDAD", "FECHA_PROXIMO_PAGO"]
     API(divDatos, campos, thTabla);
+  }else if(opcionVentaSeleccionada === 'registrar_abono'){
+    campos = ["Id"];
+    API(divDatos, campos, thTabla);
   }
 }
 
 async function API(divDatos, campos, thTabla) {
-  if (accionTabla === 'agregar') {
+  if (accionTabla === 'agregar' && opcionVentaSeleccionada === 'registrar_venta') {
+    console.log('hola');
     let div = document.createElement('div');
     div.classList.add('form-datos');
     div.innerHTML = crearFormularioNav(campos);
@@ -90,7 +95,7 @@ async function API(divDatos, campos, thTabla) {
     divDatosVenta.classList.add('tablas');
     divPanel.append(construirTabla(divDatosVenta, productosVentasAcumuladas, ["ID", "NOMBRE", "PRECIO", "CANTIDAD", " + ", " - "]));
     //aqui
-    campos = ["Id_cliente", "Tipo_venta", "Monto_total"]
+    campos = ["Id_cliente", "Tipo_venta", "Monto_total"];
     construirFormVenta(campos);
     let input = document.querySelector('.panel form input[type="text"]');
     input.addEventListener('input', (e) => {
@@ -127,8 +132,7 @@ async function API(divDatos, campos, thTabla) {
       if (valor === 'Contado') {
         thTabla = ["ID", "FECHA_DE_VENTA", "MONTO_TOTAL"];
       } else {
-        thTabla = ["ID", "FECHA_DE_VENTA", "MONTO_TOTAL", "MONTO_PAGADO", "ESTATUS", "NUMERO_MENSUALIDADES", "MONTO_MENSUALIDAD", "FECHA_PROXIMO_PAGO"]
-
+        thTabla = ["ID", "FECHA_DE_VENTA", "MONTO_TOTAL", "MONTO_PAGADO", "ESTATUS", "NUMERO_MENSUALIDADES", "MONTO_MENSUALIDAD", "FECHA_PROXIMO_PAGO","MENSUALIDADES_PAGADAS"]
       }
       //REMOVER EL ELEMENTO
       let quitarTabla = document.querySelector('.panel .tablas .no-footer');
@@ -148,6 +152,27 @@ async function API(divDatos, campos, thTabla) {
       });
     })
 
+  } else if(accionTabla === 'agregar' && opcionVentaSeleccionada === 'registrar_abono') {
+    let div = document.createElement('div');
+    div.classList.add('form-datos');
+    div.innerHTML = crearFormularioNav(campos);
+    divPanel.append(div);
+
+    let input = document.querySelector('.panel .form-datos input');
+
+    let btnBuscar = document.querySelector('.panel .form-datos input[type="submit"]');
+    btnBuscar.addEventListener('click' , async (e) => {
+      e.preventDefault();
+      limpiarHMTL();
+      let datosVenta = await obtenerDatos('venta', input.value);
+      campos = ["Monto_total","Monto_pagado","Fecha_proximo_pago","Monto_mensualidad"];
+
+      let divDatos = document.createElement('div');
+      divDatos.classList.add('tablas');
+      divPanel.append(divDatos);
+
+      construirFormVenta(campos, datosVenta, input.value);
+    })
   }
 }
 
@@ -161,23 +186,39 @@ function colocarTotal() {
   inputTotal.value = sumaTotal;
 }
 
-function construirFormVenta(campos) {
-  tipoTabla = 'clientes';
-  crearFormularioLlenado(campos, productosVentasAcumuladas)
+function construirFormVenta(campos,datosVenta, id) {
+  if(opcionVentaSeleccionada === 'registrar_venta'){
+    tipoTabla = 'clientes';
+  }else{
+    productosVentasAcumuladas = datosVenta;
+  }
+  crearFormularioLlenado(campos, productosVentasAcumuladas, id)
     .then(formularioHTML => {
       let divPane = document.querySelector('.panel .tablas');
       let divDatos = document.createElement('div');
 
       divDatos.classList.add('formulario');
       divDatos.innerHTML += formularioHTML;
-
       divPane.append(divDatos);
 
       let btnRegistrar = document.querySelector('.formulario #formulario-registro #registrar');
       btnRegistrar.addEventListener('click', (e) => {
         e.preventDefault();
         let form = document.getElementById('formulario-registro');
-        validarFormulario(form);
+        if(opcionVentaSeleccionada === 'registrar_venta'){
+          validarFormulario(form);
+        }else {
+          let montoAbonado = document.getElementById('Monto_mensualidad').value;
+          const fecha = new Date();
+          const formatoFecha = fecha.toISOString().slice(0, 10);
+          objetoForm = {};
+          objetoForm["Id_venta_credito"] = id;
+          objetoForm["Monto_abono"] = montoAbonado;
+          objetoForm["Fecha_abono"] = formatoFecha;
+          console.log(objetoForm) 
+          ponerDatos();
+        }
+
       })
     })
     .catch(error => {
@@ -224,11 +265,14 @@ function construirTabla(div, datos, thTabla, productosAVender, tipoVenta) {
       thTabla.forEach((columna) => {
         const td = document.createElement('td');
         if (columna === 'FECHA_DE_VENTA' || columna === 'FECHA_PROXIMO_PAGO') {
+          
+          if(objeto[columna]){
+            console.log(objeto[columna]);
           let fechaAPI = objeto[columna];
-          console.log(objeto[columna]);
           // Obtener solo la parte de la fecha con slice
           let fechaFormateada = fechaAPI.slice(0, 10);
           td.textContent = fechaFormateada;
+          }
         } else {
           td.textContent = objeto[columna];
         }
@@ -325,10 +369,14 @@ function formatText(text) {
   return formattedText;
 }
 
-function obtenerDatos(tipoTabla) {
+function obtenerDatos(tipoTabla, id) {
   return new Promise((resolve, reject) => {
     const arregloDatos = [];
 
+    if(id){
+      tipoTabla = `${tipoTabla}/${id}`;
+    }
+    console.log(tipoTabla)
     // Realizar una solicitud GET a la API
     fetch(`http://localhost:3000/${tipoTabla}`, {
       method: 'GET',
@@ -340,16 +388,20 @@ function obtenerDatos(tipoTabla) {
         return response.json();
       })
       .then(data => {
-        data.forEach(item => {
-          if (tipoTabla === 'clientes') {
-            const cadena = `${item.NOMBRE}`;
-            arregloDatos.push([item.ID, cadena]);
-          } else {
-
-            arregloDatos.push(item);
-          }
-        });
-        resolve(arregloDatos);
+        if(id){
+          resolve(data);
+        }else{
+          data.forEach(item => {
+            if (tipoTabla === 'clientes') {
+              const cadena = `${item.NOMBRE}`;
+              arregloDatos.push([item.ID, cadena]);
+            } else {
+  
+              arregloDatos.push(item);
+            }
+          });
+          resolve(arregloDatos);
+        }
       })
       .catch(error => {
         // Rechazar la promesa en caso de error
@@ -457,14 +509,19 @@ function limpiarHMTL() {
 async function crearFormularioLlenado(campos, datos) {
   let formulario = `<form id="formulario-registro">`;
 
-
+  console.log(datos)
   for (const campo of campos) {
     const textoLabel = formatText(campo);
 
     formulario += `<label for="${campo}">${textoLabel}</label>`;
 
     let posicion = campo.toUpperCase();
-
+    let fechaFormateada ;
+    if(campo === 'Fecha_de_venta' || campo === 'Fecha_proximo_pago'){
+      let fechaAPI = datos[posicion];
+      // Obtener solo la parte de la fecha con slice
+      fechaFormateada = fechaAPI.slice(0, 10);
+    }
 
     if (campo === 'Id_cliente') {
       let tabla = 'clientes';
@@ -481,8 +538,15 @@ async function crearFormularioLlenado(campos, datos) {
       const opciones = [['Contado', 'Contado'], ['Credito', 'Credito']];
       formulario += generateSelectField(campo, opciones);
     } else if (campo === 'Monto_total') {
-      formulario += `<input type="text" name="${campo}" id="${campo}"  disabled>`;
-    } else {
+      formulario += `<input type="text" name="${campo}" id="${campo}"  value="${datos[posicion] || ''}" disabled>`;
+    } else if(campo === 'Fecha_de_venta' || campo === 'Fecha_proximo_pago'){
+      formulario += `<input type="date" name="${campo}" id="${campo}" value="${fechaFormateada || ''}" disabled >`
+    }else if(campo === 'Monto_pagado'){
+      formulario += `<input  type="number" name="${campo}" id="${campo}" value="${datos[posicion]}" disabled>`;
+    }else if(campo === 'Monto_mensualidad'){
+      formulario += `<input type="number" name="${campo}" id="${campo}" placeholder="La cantidad minima a pagar es de ${datos[posicion]}" min="${datos[posicion]}">`;
+    }
+    else {
       formulario += `<input  type="text" name="${campo}" id="${campo}" value="${datos[posicion] || ''}" >`;
     }
   }
@@ -512,7 +576,9 @@ function validarFormulario(form) {
   objetoForm = {};
   objetoForm["DetallesVentaJSON"] = objetoParaApi;
   objetoForm = objetosForm(form, objetoForm);
-  objetoForm.Fecha_de_venta = '2023-11-27';
+  const fecha = new Date();
+  const formatoFecha = fecha.toISOString().slice(0, 10);
+  objetoForm.Fecha_de_venta = formatoFecha;
   console.log(objetoForm);
   let tipoElegido = document.getElementById('Tipo_venta').value;
 
@@ -520,6 +586,7 @@ function validarFormulario(form) {
   if (tipoElegido === 'Credito') {
     objetoForm["Monto_pagado"] = 0.00;
     objetoForm["Estatus"] = 'No pagado';
+    objetoForm["Mensualidades_pagadas"] = 0;
     agregarModal();
   } else {
 
@@ -653,7 +720,11 @@ function objetosForm(form) {
 
 async function ponerDatos() {
   console.log(objetoForm);
-  let tipoTabla = 'RegistrarVentaConDetalles';
+  if(opcionVentaSeleccionada === 'registrar_venta'){
+    tipoTabla = 'RegistrarVentaConDetalles';
+  }else if(opcionVentaSeleccionada === 'registrar_abono'){
+    tipoTabla = 'registrar_abono_venta';
+  }
   console.log(`Enviando solicitud a http://localhost:3000/${tipoTabla}`);
 
 
