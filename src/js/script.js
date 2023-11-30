@@ -1,21 +1,53 @@
 
-import { hola } from './clientes.js';
 
-document.addEventListener('DOMContentLoaded', function () {
-    hola();
-    agregarcosa();
-});
-// Llama a la función exportada
 
-function agregarcosa() {
-    const nav = document.querySelector('.navegacion')
+const verificar_permiso = (rol, modulo) => {
 
-    const p = document.createElement('div');
-    p.innerHTML = ``;
+    if (rol == 'Admin' || rol == 'Gerente') {
+        return true;
+    } else if (rol == 'Vendedor' && (modulo == 'Ventas' || modulo == 'Clientes' || modulo == 'Garantias' || modulo == 'Registrar garantia' || modulo == 'Consultar garantia')) {
+        return true;
+    } else if (rol == 'Artesano' && (modulo == 'Producto terminado' || modulo == 'Almacen producto terminado')) {
+        return true;
+    } else if (rol == 'Almacenista' && (modulo == 'Almacen materia prima' || modulo == 'Almacen producto terminado')) {
+        return true;
+    } else if (rol == 'Atencion al cliente' && (modulo == 'Garantias' || modulo == 'Registrar garantia' || modulo == 'Consultar garantia' || modulo == 'Registrar devolucion de cliente')) {
+        return true;
+    } else if (rol == 'Contabilidad' && (modulo == 'Informes')) {
+        return true;
+    } else if (rol == 'Encargado de compras' && (modulo == 'Compras' || modulo == 'Proveedores')) {
+        return true;
+    } else {
+        return false;
+    }
 
-    nav.appendChild(p);
+};
 
+
+if (verificar_permiso('Vendedor', 'Compras')) {
+    console.log('SI tiene permiso')
+} else if (verificar_permiso('Vendedor', 'Compras') == false) {
+    console.log('NO tiene permiso')
 }
+
+
+// import { hola } from './clientes.js';
+
+// document.addEventListener('DOMContentLoaded', function () {
+//     hola();
+//     agregarcosa();
+// });
+// // Llama a la función exportada
+
+// function agregarcosa() {
+//     const nav = document.querySelector('.navegacion')
+
+//     const p = document.createElement('div');
+//     p.innerHTML = ``;
+
+//     nav.appendChild(p);
+
+// }
 
 
 /*

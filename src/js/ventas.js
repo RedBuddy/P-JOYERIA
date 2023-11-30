@@ -8,6 +8,26 @@ let productosVentasAcumuladas = [];
 
 let objetoForm;
 
+//Verificacion de permiso para el subsistema
+import { verificar_permiso_subsistema, verificar_permiso_modulo } from "./loggin.js";
+let nombreHtml = window.location.pathname.split("/").pop();
+const nivel_acceso = localStorage.getItem('nivel_acceso');
+console.log(nivel_acceso)
+
+if (!verificar_permiso_subsistema(nivel_acceso, nombreHtml.split('.')[0])) {
+  Swal.fire({
+    icon: 'error',
+    title: 'Acceso Denegado',
+    text: 'No tienes acceso a este contenido',
+    allowOutsideClick: false
+  }).then((result) => {
+    if (!result.isDismissed) {
+      window.location.href = 'inicio.html';
+    }
+  });
+}
+
+
 opcionesVenta.forEach((opcion) => {
   opcion.addEventListener('click', e => {
     e.preventDefault();
