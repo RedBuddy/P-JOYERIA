@@ -39,7 +39,7 @@ function pintarHtml() {
         productosComprasAcumuladas = [];
         API(divDatos, campos);
     } else if (opcionCompraSeleccionada === 'historial_compra') {
-        campos = ["Tipo_venta"];
+        campos = ["Tipo_compra"];
         thTabla = ["ID", "FECHA_DE_VENTA", "MONTO_TOTAL", "MONTO_PAGADO", "ESTATUS", "NUMERO_MENSUALIDADES", "MONTO_MENSUALIDAD", "FECHA_PROXIMO_PAGO"]
         API(divDatos, campos, thTabla);
     } else if (opcionCompraSeleccionada === 'registrar_abono') {
@@ -57,10 +57,12 @@ async function API(divDatos, campos, thTabla) {
             div.innerHTML += `<ul id="productList"></ul> `;
         }
 
+        console.log('aki');
+
+
         let productos = await obtenerDatos('materia_prima')
 
-
-
+        
         divPanel.append(div);//aqui yo tengo eso
         //INICIALIZO LA TABLA SIN NADA PARA PONER EL FORM
 
@@ -104,18 +106,19 @@ async function API(divDatos, campos, thTabla) {
             e.preventDefault();
             let valor = document.querySelector('.form-datos form select').value;
             if (valor === 'Contado') {
-                thTabla = ["ID", "FECHA_DE_VENTA", "MONTO_TOTAL"];
+                thTabla = ["ID", "FECHA", "MONTO_TOTAL"];
             } else {
-                thTabla = ["ID", "FECHA_DE_VENTA", "MONTO_TOTAL", "MONTO_PAGADO", "ESTATUS", "NUMERO_MENSUALIDADES", "MONTO_MENSUALIDAD", "FECHA_PROXIMO_PAGO", "MENSUALIDADES_PAGADAS"]
+                thTabla = ["ID", "FECHA", "MONTO_TOTAL", "MONTO_PAGADO", "ESTATUS", "NUMERO_MENSUALIDADES", "MONTO_MENSUALIDAD", "FECHA_PROXIMO_PAGO", "MENSUALIDADES_PAGADAS"]
             }
             //REMOVER EL ELEMENTO
             let quitarTabla = document.querySelector('.panel .tablas .no-footer');
             if (quitarTabla) {
                 quitarTabla.remove();
             }
-
+            
             divPanel.append(divDatos);
             divPanel.append(await construirTabla(divDatos, datos, thTabla, null, valor));
+            console.log(datos);
             $('.tabla').DataTable({
                 lengthChange: false,
                 info: false,
@@ -138,7 +141,8 @@ async function API(divDatos, campos, thTabla) {
         btnBuscar.addEventListener('click', async (e) => {
             e.preventDefault();
             limpiarHMTL();
-            let datosVenta = await obtenerDatos('venta', input.value);
+            let datosVenta = await obtenerDatos('compra', input.value);
+            console.log(datosVenta);
             campos = ["Monto_total", "Monto_pagado", "Fecha_proximo_pago", "Monto_mensualidad"];
 
             let divDatos = document.createElement('div');
@@ -192,10 +196,10 @@ function construirFormVenta(campos, datosVenta, id) {
                     const fecha = new Date();
                     const formatoFecha = fecha.toISOString().slice(0, 10);
                     objetoForm = {};
-                    objetoForm["Id_venta_credito"] = id;
+                    objetoForm["Id_compra_credito"] = id;
                     objetoForm["Monto_abono"] = montoAbonado;
                     objetoForm["Fecha_abono"] = formatoFecha;
-                    console.log(objetoForm)
+                    console.log(objetoForm, 'd')
                     ponerDatos();
                 }
 
@@ -214,11 +218,11 @@ function construirTabla(div, datos, thTabla, productosAVender, tipoVenta) {
     console.log(tipoVenta);
     if (tipoVenta === 'Contado') {
         datos = datos.filter(function (objeto) {
-            return objeto.TIPO_VENTA === "Contado";
+            return objeto.TIPO_COMPRA === "Contado";
         });
     } else if (tipoVenta === 'Credito') {
         datos = datos.filter(function (objeto) {
-            return objeto.TIPO_VENTA === "Credito";
+            return objeto.TIPO_COMPRA === "Credito";
         });
     }
     const tabla = document.createElement('table');
@@ -245,7 +249,7 @@ function construirTabla(div, datos, thTabla, productosAVender, tipoVenta) {
             thTabla.forEach((columna) => {
                 console.log(objeto);
                 const td = document.createElement('td');
-                if (columna === 'FECHA_DE_VENTA' || columna === 'FECHA_PROXIMO_PAGO') {
+                if (columna === 'FECHA' || columna === 'FECHA_PROXIMO_PAGO') {
 
                     if (objeto[columna]) {
                         console.log(objeto[columna]);
@@ -364,6 +368,8 @@ function obtenerDatos(tipoTabla, id) {
             tipoTabla = `${tipoTabla}/${id}`;
         }
         console.log(tipoTabla)
+    console.log(`Enviando solicitud a http://localhost:3000/${tipoTabla}`);
+
         // Realizar una solicitud GET a la API
         fetch(`http://localhost:3000/${tipoTabla}`, {
             method: 'GET',
@@ -514,7 +520,7 @@ async function crearFormularioLlenado(campos, datos) {
 
         let posicion = campo.toUpperCase();
         let fechaFormateada;
-        if (campo === 'Fecha_de_venta' || campo === 'Fecha_proximo_pago') {
+        if (campo === 'Fecha_de_compra' || campo === 'Fecha_proximo_pago') {
             let fechaAPI = datos[posicion];
             // Obtener solo la parte de la fecha con slice
             fechaFormateada = fechaAPI.slice(0, 10);
@@ -722,7 +728,7 @@ async function ponerDatos() {
     if (opcionCompraSeleccionada === 'registrar_compra') {
         tipoTabla = 'RegistrarCompraConDetalles';
     } else if (opcionCompraSeleccionada === 'registrar_abono') {
-        tipoTabla = 'registrar_abono_venta';
+        tipoTabla = 'registrar_abono_compra';
     }
     console.log(`Enviando solicitud a http://localhost:3000/${tipoTabla}`);
 
