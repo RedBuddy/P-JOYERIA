@@ -341,10 +341,10 @@ function aumentarEliminar(e, productosAVender) {
 }
 
 function crearFormularioNav(campos) {
-  let formulario = '<form action="" class="form">';
+  let formulario = '<form action="" class="form" autocomplete="off">';
   campos.forEach(campo => {
     let titulo = formatText(campo);
-    let input = `<input type="text" name="${campo}" id="${campo}" class=""></input>`
+    let input = `<input type="text" name="${campo}" id="${campo}" class="" autocomplete="off"></input>`
     if (campo === 'Tipo_venta') {
       const opciones = [['Contado', 'Contado'], ['Credito', 'Credito']];
       input = generateSelectField(campo, opciones);
@@ -352,7 +352,7 @@ function crearFormularioNav(campos) {
     formulario += `
       <label>${titulo}</label>
       ${input}
-      <input type="submit" name="${campo}" id="${campo}" value="Buscar" class="producto">`;
+      <input type="submit" name="${campo}" id="${campo}" value="Buscar" class="producto" autocomplete="off">`;
   });
 
   formulario += '</form>';
@@ -507,7 +507,7 @@ function limpiarHMTL() {
 
 //CREAR FORMULARIO
 async function crearFormularioLlenado(campos, datos) {
-  let formulario = `<form id="formulario-registro">`;
+  let formulario = `<form id="formulario-registro" autocomplete="off">`;
 
   console.log(datos)
   for (const campo of campos) {
@@ -538,7 +538,7 @@ async function crearFormularioLlenado(campos, datos) {
       const opciones = [['Contado', 'Contado'], ['Credito', 'Credito']];
       formulario += generateSelectField(campo, opciones);
     } else if (campo === 'Monto_total') {
-      formulario += `<input type="text" name="${campo}" id="${campo}"  value="${datos[posicion] || ''}" disabled>`;
+      formulario += `<input type="text" name="${campo}" id="${campo}"  value="${datos[posicion] || ''}" disabled >`;
     } else if(campo === 'Fecha_de_venta' || campo === 'Fecha_proximo_pago'){
       formulario += `<input type="date" name="${campo}" id="${campo}" value="${fechaFormateada || ''}" disabled >`
     }else if(campo === 'Monto_pagado'){
@@ -547,7 +547,7 @@ async function crearFormularioLlenado(campos, datos) {
       formulario += `<input type="number" name="${campo}" id="${campo}" placeholder="La cantidad minima a pagar es de ${datos[posicion]}" min="${datos[posicion]}">`;
     }
     else {
-      formulario += `<input  type="text" name="${campo}" id="${campo}" value="${datos[posicion] || ''}" >`;
+      formulario += `<input  type="text" name="${campo}" id="${campo}" value="${datos[posicion] || ''}" autocomplete="off">`;
     }
   }
 
@@ -617,7 +617,7 @@ function agregarModal() {
 
       
       <label for="mensualidad">Mensualidad:</label>
-      <input id="Monto_mensualidad" name="Monto_mensualidad" type="text"> 
+      <input id="Monto_mensualidad" name="Monto_mensualidad" type="text" autocomplete="off"> 
       <button type="button" onclick="cerrarModal()" id="cerrar">Cerrar</button>
       <button type="button" id="registrarVenta"> Registrar </button>
     </form>
