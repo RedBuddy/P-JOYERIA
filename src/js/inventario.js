@@ -154,7 +154,7 @@ function pintarHtml() {
     let campos, thTabla;
     //DEPENDIENDO QUE SUBSISTEMA ES
     if (tipoTabla === 'materia_prima') {
-        sePuede = true;
+        // sePuede = true;
         if (opcionInventarioSeleccionada === "agregar_materia_prima" || opcionInventarioSeleccionada === "editar_materia_prima") {
             campos = ["Nombre", "Id_proveedor", "Id_categoria", "Unidad_de_medida", "Precio_de_compra"];
         }

@@ -1,11 +1,12 @@
 
 const nivel_acceso = localStorage.getItem('nivel_acceso');
+const sinlog = 'unloged';
 
-if (nivel_acceso == null) {
+if (nivel_acceso == 'unloged' || typeof nivel_acceso === 'undefined') {
     Swal.fire({
         icon: 'error',
         title: 'Acceso Denegado',
-        text: 'No tienes acceso a este contenido',
+        text: 'Por favor ingresa tus credenciales',
         allowOutsideClick: false
     }).then((result) => {
         if (!result.isDismissed) {
@@ -13,3 +14,12 @@ if (nivel_acceso == null) {
         }
     });
 }
+
+
+const btn_logout = document.querySelector('.nav-link-logout');
+
+btn_logout.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = '../../index.html';
+    localStorage.setItem('nivel_acceso', sinlog);
+})
