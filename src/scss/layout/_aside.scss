@@ -69,3 +69,8 @@ aside {
         margin-right: 2rem;
     }
 }
+
+.nav-link-logout {
+    margin-top: 30rem;
+    @include m.style-boton(red);
+}
