@@ -2,7 +2,8 @@ let opcionesEmpleados = document.querySelectorAll('.panel .nav-sup .nav-sup-link
 let panelEmpleados = document.querySelector('.panel .nav-sup');
 let divPanel = document.querySelector('.panel');
 let opcionEmpleadosSeleccionada;
-
+let tipoTabla;
+let accionTabla;
 //Verificacion de permiso para el subsistema
 import { verificar_permiso_subsistema, verificar_permiso_modulo, contenido_denegado } from "./loggin.js";
 let nombreHtml = window.location.pathname.split("/").pop();
@@ -38,9 +39,9 @@ function pintarHtml() {
     let divDatos = document.createElement('div');
 
     if (opcionEmpleadosSeleccionada === 'agregar_empleado' || opcionEmpleadosSeleccionada === 'editar_empleado') {
-        campos = ["Nombre", "RFC", "Celular", "Puesto", "Fecha_ingreso", "Turno", "Salario_hora", "Correo", "Fecha_nacimiento", "Direccion", "Activo"];
+        campos = ["Nombre", "Telefono", "Fecha_nacimiento", "Correo", "Direccion", "Fecha_ingreso", "RFC", "Turno", "Salario_hora", "Puesto", "Activo"];
     } else if (opcionEmpleadosSeleccionada === 'consultar_empleado') {
-        thTabla = ["ID", "NOMBRE", "RFC", "CELULAR", "PUESTO", "FECHA_INGRESO", "TURNO", "SALARIO_HORA", "CORREO", "FECHA_NACIMIENTO", "DIRECCION", "ACTIVO"];
+        thTabla = ["ID", "NOMBRE", "RFC", "PUESTO", "FECHA_INGRESO", "TURNO", "SALARIO_HORA", "ACTIVO"];
     }
 
     API(divDatos, campos, thTabla);
@@ -48,7 +49,7 @@ function pintarHtml() {
 }
 
 function crearFormularioNav(campos) {
-    let formulario = '<form action="" class="form">';
+    let formulario = '<form action="" class="form" name="nav">';
     campos.forEach(campo => {
         let titulo = formatText(campo);
         formulario += `
@@ -89,7 +90,6 @@ async function API(divDatos, campos, thTabla) {
             }, "pageLength": 7,
         });
     } else if (accionTabla === "editar") {
-        console.log(campos)
         let div = document.createElement('div');
         div.classList.add('form-datos');
         let camposAux = ["Id_" + tipoTabla];
@@ -97,9 +97,16 @@ async function API(divDatos, campos, thTabla) {
         divPanel.append(div);
         let btnRegistrar = document.querySelector('.form input[type="submit"]');
         btnRegistrar.addEventListener('click', (e) => {
-            const id = document.querySelector('.form input[type="text"]');
-            limpiarHtml();
-            edicionDatos(e, campos, id.value);
+            e.preventDefault();
+            let formularioCorrecto = validarFormularioInput('nav');
+            if (formularioCorrecto) {
+                console.log('hola');
+                const id = document.querySelector('.form input[type="text"]');
+                limpiarHtml();
+                edicionDatos(e, campos, id.value);
+            } else {
+                swal('Llena el campo correspondiente', '', 'error');
+            }
         })
     } else {
         crearFormulario(campos)
@@ -159,11 +166,15 @@ function obtenerDatos(tipoTabla) {
 async function tomarDatos(e) {
     e.preventDefault();
     const form = document.querySelector("#formulario-registro");
-    let hola = ponerDatos(form, tipoTabla);
+    let formularioCorrecto = validarFormularioInput('formulario-registro');
+    if (formularioCorrecto) {
+        swal('Empleado añadido correctamente', '', 'success');
+        let id = ponerDatos(form);
+    }
 }
 
 async function crearFormulario(campos) {
-    let formulario = `<form id="formulario-registro">`;
+    let formulario = `<form id="formulario-registro" name="formulario-registro">`;
 
     for (let campo of campos) {
         const textoLabel = formatText(campo);
@@ -171,13 +182,15 @@ async function crearFormulario(campos) {
 
         formulario += `<label for="${campo}">${textoLabel}</label>`;
 
-        if (campo === 'Fecha_ingreso') {
+        if (campo === 'Fecha_ingreso' || campo === 'Fecha_nacimiento') {
             formulario += `<input type="date" name="${campo}" id="${campo}">`;
         } else if (campo === 'Puesto') {
             const opciones = [["Gerente", "Gerente"], ["Vendedor", "Vendedor"], ["Almacenista", "Almacenista"], ["Asistente de ventas", "Asistente de ventas"], ["Comprador", "Comprador"]];
             formulario += generateSelectField(campo, opciones, tipoTabla);
         } else if (campo === 'Turno') {
             formulario += generateSelectField(campo, [["Matutino", "Matutino"], ["Vespertino", "Vespertino"]]);
+        } else if (campo === 'Salario_hora') {
+            formulario += `<input type="number" name="${campo}" id="${campo}">`;
         } else {
             formulario += `<input type="text" name="${campo}" id="${campo}">`;
         }
@@ -187,7 +200,7 @@ async function crearFormulario(campos) {
     return formulario;
 }
 
-function ponerDatos(form, tipoTabla) {
+function ponerDatos(form) {
     const form_data = new FormData(form);
     const data = new URLSearchParams(form_data);
 
@@ -245,7 +258,8 @@ async function construirTabla(datos, thTabla) {
     const trHead = document.createElement('tr');
     thTabla.forEach((thText) => {
         const th = document.createElement('th');
-        th.textContent = thText;
+        let titulo = formatText(thText);
+        th.textContent = titulo;
         trHead.appendChild(th);
     });
     thead.appendChild(trHead);
@@ -259,7 +273,17 @@ async function construirTabla(datos, thTabla) {
             const tr = document.createElement('tr');
             thTabla.forEach((columna) => {
                 const td = document.createElement('td');
-                td.textContent = fila[columna];  // Utilizar directamente la columna como clave
+                if (columna === 'FECHA_INGRESO') {
+
+                    if (fila[columna]) {
+                        let fechaAPI = fila[columna];
+                        // Obtener solo la parte de la fecha con slice
+                        let fechaFormateada = fechaAPI.slice(0, 10);
+                        td.textContent = fechaFormateada;
+                    }
+                } else {
+                    td.textContent = fila[columna];
+                }  // Utilizar directamente la columna como clave
                 tr.appendChild(td);
             });
             tbody.appendChild(tr);
@@ -306,9 +330,13 @@ async function llenarFormulario(campos, id) {
                 try {
                     // Maneja la promesa devuelta por actualizarDatos
 
-                    let form = document.querySelector("#formulario-registro");
-                    await actualizarDatos(form, tipoTabla, id);
-                    console.log('Datos actualizados con éxito');
+                    const form = document.querySelector("#formulario-registro");
+                    let formularioCorrecto = validarFormularioInput('formulario-registro');
+                    console.log(formularioCorrecto)
+                    if (formularioCorrecto) {
+                        swal('Empleado editado correctamente', '', 'success');
+                        await actualizarDatos(form, tipoTabla, id);
+                    }
                 } catch (error) {
                     console.error('Error al actualizar datos:', error);
                 }
@@ -324,7 +352,7 @@ async function llenarFormulario(campos, id) {
 
 
 async function crearFormularioLlenado(campos, datos) {
-    let formulario = `<form id="formulario-registro">`;
+    let formulario = `<form id="formulario-registro" name="formulario-registro">`;
 
 
     for (const campo of campos) {
@@ -335,8 +363,11 @@ async function crearFormularioLlenado(campos, datos) {
         let posicion = campo.toUpperCase();
 
 
-        if (campo === 'Fecha_ingreso') {
-            formulario += `<input type="date" name="${campo}" id="${campo}" value="${datos[posicion] || ''}">`;
+        if (campo === 'Fecha_ingreso' || campo === 'Fecha_nacimiento') {
+            let fechaAPI = datos[posicion];
+            // Obtener solo la parte de la fecha con slice
+            let fechaFormateada = fechaAPI.slice(0, 10);
+            formulario += `<input type="date" name="${campo}" id="${campo}" value="${fechaFormateada || ''}">`;
         } else {
             formulario += `<input type="text" name="${campo}" id="${campo}" value="${datos[posicion] || ''}">`;
         }
@@ -428,4 +459,76 @@ function eliminarDatosId(tipoTabla, id) {
                 reject(error);
             });
     });
+}
+
+function generateSelectField(fieldName, options, selectedValue) {
+    let selectHTML = `<select id="${fieldName}" name="${fieldName}">
+        <option value="" disabled selected>Selecciona uno</option>`;
+
+
+    console.log(selectedValue)
+
+    for (const option of options) {
+        selectHTML += `<option value="${option[0]}" ${selectedValue === option[0] ? 'selected' : ''}>${option[1]}</option>`;
+    }
+
+    selectHTML += '</select>';
+    return selectHTML;
+}
+
+function validarFormularioInput(name) {
+    // Obtener todos los elementos del formulario
+    var elementosFormulario = document.forms[name].elements;
+    // Iterar sobre los elementos y verificar si están llenos
+    for (var i = 0; i < elementosFormulario.length; i++) {
+        // Verificar solo los elementos que son input, select o textarea
+        if (elementosFormulario[i].type !== 'submit' && elementosFormulario[i].type !== 'reset' && elementosFormulario[i].type !== 'button') {
+            if (elementosFormulario[i].value === '') {
+                swal('Llena todos los campos correctamente', '', 'error');
+
+                return false; // Evitar que el formulario se envíe
+            }
+        }
+        if (elementosFormulario[i].id === 'RFC') {
+            if (!validarRFC(elementosFormulario[i].value)) {
+                swal('RFC incorrecto', 'El RFC es incorrecto', 'error');
+                console.log('entro pero soy gay');
+                return false;
+            }
+        }
+        if (elementosFormulario[i].id === 'Telefono') {
+            if (!validarNumeroCelular(elementosFormulario[i].value)) {
+                swal('Telefono incorrecto', 'El telefono es incorrecto', 'error');
+                console.log('entro pero soy gay');
+                return false;
+            }
+        }
+        if (elementosFormulario[i].id === 'Correo') {
+            if (!validarCorreoElectronico(elementosFormulario[i].value)) {
+                swal('Correo electronico incorrecto', 'Asegurate que el correo electronico sea correcto', 'error');
+                console.log('entro pero soy gay');
+                return false;
+            }
+        }
+    }
+
+    // Si todos los campos están llenos, permitir el envío del formulario
+    return true;
+}
+
+function validarRFC(rfc) {
+    const regexRFC = /^[A-Z]{4}\d{6}[A-Z\d]{3}$/;
+    return regexRFC.test(rfc);
+}
+
+function validarNumeroCelular(numero) {
+    // Asumiendo un formato común de 10 dígitos para números de teléfono en tu región
+    const regexNumeroCelular = /^[0-9]{10}$/;
+    return regexNumeroCelular.test(numero);
+}
+
+function validarCorreoElectronico(correo) {
+    // Expresión regular básica para validar el formato de un correo electrónico
+    const regexCorreoElectronico = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    return regexCorreoElectronico.test(correo);
 }

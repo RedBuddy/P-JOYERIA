@@ -5,7 +5,7 @@ let tipoTabla;
 let accionTabla;
 let productosVentasAcumuladas = [];
 let objetoForm;
-
+let cantidadMinimaPagar;
 //Verificacion de permiso para el subsistema
 import { verificar_permiso_subsistema, verificar_permiso_modulo, contenido_denegado } from "./loggin.js";
 let nombreHtml = window.location.pathname.split("/").pop();
@@ -70,7 +70,6 @@ async function API(divDatos, campos, thTabla) {
 
     let productos = await obtenerDatos('producto_terminado')
 
-
     const productosAVender = productosDisponibles.reduce((result, producto) => {
       const cantidadDisponible = producto.CANTIDAD;
 
@@ -119,11 +118,11 @@ async function API(divDatos, campos, thTabla) {
         agregarProductoAcumulado(objetoEncontrado);
         let tabla = construirTabla(divDatosVenta, productosVentasAcumuladas, ["ID", "NOMBRE", "PRECIO", "CANTIDAD", " + ", " - "], productosAVender);
         divPanel.append(tabla);
-        console.log(productosVentasAcumuladas)
         colocarTotal();
+      }else{
+        swal ( "Oops" ,  "Por favor, llena el campo correctamente" ,  "error" );
       }
     })
-
 
 
   } else if (accionTabla === 'consultar') {
@@ -136,11 +135,13 @@ async function API(divDatos, campos, thTabla) {
     let btnRegistrar = document.querySelector('.form-datos form input[type="submit"]');
     btnRegistrar.addEventListener('click', async (e) => {
       e.preventDefault();
-      let valor = document.querySelector('.form-datos form select').value;
+      let formularioCorrecto = validarFormularioInput('nav');
+      if(formularioCorrecto){
+        let valor = document.querySelector('.form-datos form select').value;
       if (valor === 'Contado') {
         thTabla = ["ID", "FECHA_DE_VENTA", "MONTO_TOTAL"];
       } else {
-        thTabla = ["ID", "FECHA_DE_VENTA", "MONTO_TOTAL", "MONTO_PAGADO", "ESTATUS", "NUMERO_MENSUALIDADES", "MONTO_MENSUALIDAD", "FECHA_PROXIMO_PAGO", "MENSUALIDADES_PAGADAS"]
+        thTabla = ["ID",  "MONTO_TOTAL", "MONTO_PAGADO", "ESTATUS", "FECHA_PROXIMO_PAGO", "MENSUALIDADES_PAGADAS"]
       }
       //REMOVER EL ELEMENTO
       let quitarTabla = document.querySelector('.panel .tablas .no-footer');
@@ -155,9 +156,14 @@ async function API(divDatos, campos, thTabla) {
         info: false,
         "language": {
           "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json"
-        }, "pageLength": 7,
-        "autoWidth": true
+        }, "pageLength": 7
+        
+        
+        
       });
+      }else{
+        swal("Algo salio mal","Elige el tipo de venta correctamente","error");
+      }
     })
 
   } else if (accionTabla === 'agregar' && opcionVentaSeleccionada === 'registrar_abono') {
@@ -171,6 +177,8 @@ async function API(divDatos, campos, thTabla) {
     let btnBuscar = document.querySelector('.panel .form-datos input[type="submit"]');
     btnBuscar.addEventListener('click', async (e) => {
       e.preventDefault();
+      let formularioCorrecto = validarFormularioInput('nav');
+      if(formularioCorrecto){
       limpiarHMTL();
       let datosVenta = await obtenerDatos('venta', input.value);
       campos = ["Monto_total", "Monto_pagado", "Fecha_proximo_pago", "Monto_mensualidad"];
@@ -178,8 +186,11 @@ async function API(divDatos, campos, thTabla) {
       let divDatos = document.createElement('div');
       divDatos.classList.add('tablas');
       divPanel.append(divDatos);
-
+      console.log('hola');
       construirFormVenta(campos, datosVenta, input.value);
+      }else{
+        swal('Algo salio mal', 'Llena el campo correspondiente',"error");
+      }
     })
   }
 }
@@ -222,9 +233,21 @@ function construirFormVenta(campos, datosVenta, id) {
           objetoForm = {};
           objetoForm["Id_venta_credito"] = id;
           objetoForm["Monto_abono"] = montoAbonado;
+          console.log('hola');
           objetoForm["Fecha_abono"] = formatoFecha;
-          console.log(objetoForm)
-          ponerDatos();
+          let formularioCorrecto = validarFormularioInput('formulario-venta');
+          if(formularioCorrecto){
+            console.log(montoAbonado, cantidadMinimaPagar);
+            if(parseInt(montoAbonado) < parseInt(cantidadMinimaPagar)){
+              swal('Algo salio mal', 'La cantidad de monto abonado es incorrecta','error');
+            }else{
+              swal('Abono registrado correctamente','El abono ha sido registrado','success');              
+            ponerDatos();
+            }
+          }else {
+              swal('Algo salio mal', 'Llena correctamente la cantidad de monto abonado','error');
+            
+          }
         }
 
       })
@@ -258,7 +281,8 @@ function construirTabla(div, datos, thTabla, productosAVender, tipoVenta) {
   console.log(thTabla);
   thTabla.forEach((thText) => {
     const th = document.createElement('th');
-    th.textContent = thText;
+    let titulo = formatText(thText);
+    th.textContent = titulo;
     trHead.appendChild(th);
   });
   thead.appendChild(trHead);
@@ -349,7 +373,7 @@ function aumentarEliminar(e, productosAVender) {
 }
 
 function crearFormularioNav(campos) {
-  let formulario = '<form action="" class="form" autocomplete="off">';
+  let formulario = '<form action="" class="form" autocomplete="off" name="nav">';
   campos.forEach(campo => {
     let titulo = formatText(campo);
     let input = `<input type="text" name="${campo}" id="${campo}" class="" autocomplete="off"></input>`
@@ -440,7 +464,6 @@ function agregarProductoAcumulado(producto) {
   console.log(productosVentasAcumuladas);
 }
 
-
 //REFERENTE SELECT
 async function autocompletarProductos(datos) {
   // Obtén el valor del input de búsqueda
@@ -457,7 +480,6 @@ async function autocompletarProductos(datos) {
 
   // Aquí podrías realizar una solicitud al servidor para obtener los productos
   // En este ejemplo, utilizamos un array simulado de productos
-
 
   // Filtra los productos por coincidencia en el nombre o categoría
   let productosFiltrados = productos.filter(function (producto) {
@@ -483,7 +505,6 @@ function mostrarProductos(productos) {
   // Muestra la lista debajo del input
   lista.style.display = productos.length > 0 ? "block" : "none";
 
-
 }
 
 function seleccionarProducto(event) {
@@ -503,6 +524,7 @@ document.addEventListener("click", function (event) {
 });
 
 function limpiarHMTL() {
+  console.log('hola limpiar');
   let opciones = ['form-datos', 'almacen-mp', 'form', 'tabla', 'tablas', 'no-footer'];
   let selector = opciones.map(opc => '.' + opc).join(', ');
   let elementos = divPanel.querySelectorAll(selector);
@@ -512,14 +534,17 @@ function limpiarHMTL() {
   });
 }
 
-
 //CREAR FORMULARIO
 async function crearFormularioLlenado(campos, datos) {
-  let formulario = `<form id="formulario-registro" autocomplete="off">`;
+  let formulario = `<form id="formulario-registro" autocomplete="off" name="formulario-venta">`;
 
   console.log(datos)
   for (const campo of campos) {
-    const textoLabel = formatText(campo);
+   let textoLabel = formatText(campo);
+
+   if(campo === 'Id_cliente'){
+    textoLabel = 'Cliente';
+   }
 
     formulario += `<label for="${campo}">${textoLabel}</label>`;
 
@@ -552,6 +577,7 @@ async function crearFormularioLlenado(campos, datos) {
     } else if (campo === 'Monto_pagado') {
       formulario += `<input  type="number" name="${campo}" id="${campo}" value="${datos[posicion]}" disabled>`;
     } else if (campo === 'Monto_mensualidad') {
+      cantidadMinimaPagar = datos[posicion];
       formulario += `<input type="number" name="${campo}" id="${campo}" placeholder="La cantidad minima a pagar es de ${datos[posicion]}" min="${datos[posicion]}">`;
     }
     else {
@@ -567,7 +593,6 @@ function generateSelectField(fieldName, options, selectedValue) {
   let selectHTML = `<select id="${fieldName}" name="${fieldName}">
       <option value="" disabled selected>Selecciona uno</option>`;
 
-
   console.log(options[0])
 
   for (const option of options) {
@@ -578,7 +603,7 @@ function generateSelectField(fieldName, options, selectedValue) {
   return selectHTML;
 }
 
-function validarFormulario(form) {
+async function validarFormulario(form) {
   let objetoParaApi = constructorObjetoProducto();
   console.log(objetoParaApi);
   objetoForm = {};
@@ -590,15 +615,19 @@ function validarFormulario(form) {
   console.log(objetoForm);
   let tipoElegido = document.getElementById('Tipo_venta').value;
 
-
   if (tipoElegido === 'Credito') {
     objetoForm["Monto_pagado"] = 0.00;
     objetoForm["Estatus"] = 'No pagado';
     objetoForm["Mensualidades_pagadas"] = 0;
     agregarModal();
   } else {
-
-    ponerDatos();
+    let formularioCorrecto = validarFormularioInput('formulario-venta');
+    if(formularioCorrecto){
+      ponerDatos();
+      swal("Venta registrada", ``, "success");
+    }else{
+      swal('Oops', 'Llena los datos de la venta correctamente', 'error');
+    }
   }
 }
 
@@ -607,8 +636,8 @@ function agregarModal() {
   const modal = document.createElement('div');
   modal.classList.add('modal', 'formulario');
   modal.innerHTML = `
-  <div class="modal-content">
-    <form class="formulario-registro">
+  <div class="modal-content-ya">
+    <form class="formulario-registro" name="formulario-venta-credito">
       <label for="plazoOptions">Plazo de Crédito: (SIN INTERESES)</label>
       <select id="Numero_mensualidades" name="Numero_mensualidades">
         <option value="">Selecciona uno</option>
@@ -626,7 +655,7 @@ function agregarModal() {
       
       <label for="mensualidad">Mensualidad:</label>
       <input id="Monto_mensualidad" name="Monto_mensualidad" type="text" autocomplete="off"> 
-      <button type="button" onclick="cerrarModal()" id="cerrar">Cerrar</button>
+      <button type="button" id="cerrar">Cerrar</button>
       <button type="button" id="registrarVenta"> Registrar </button>
     </form>
   </div>
@@ -641,7 +670,6 @@ function agregarModal() {
 
 
 
-
   // Manejar el evento para cerrar el modal
   const closeModalBtn = document.getElementById('cerrar');
   closeModalBtn.addEventListener('click', () => {
@@ -651,11 +679,16 @@ function agregarModal() {
   const btnRegistrar = document.getElementById('registrarVenta');
   console.log(btnRegistrar)
   btnRegistrar.addEventListener('click', () => {
-
-    ponerDatos();
+    let formularioCorrecto = validarFormularioInput('formulario-venta-credito');
+    if(formularioCorrecto){
+      console.log(objetoForm);
+      ponerDatos();
+      swal("Venta registrada", ``, "success");
+    }else{
+      swal('Oops', 'Llena correctamente todos los campos', 'error');
+    }
   })
 }
-
 
 function ventaCredito(form) {
   let plazoOptions = document.getElementById('Numero_mensualidades');
@@ -735,7 +768,6 @@ async function ponerDatos() {
   }
   console.log(`Enviando solicitud a http://localhost:3000/${tipoTabla}`);
 
-
   fetch(`http://localhost:3000/${tipoTabla}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -754,4 +786,22 @@ async function ponerDatos() {
     .catch(error => {
       console.error(error); // Agregar esta línea para ver el error en la consola
     });
+}
+
+function validarFormularioInput(name) {
+  // Obtener todos los elementos del formulario
+  var elementosFormulario = document.forms[name].elements;
+  // Iterar sobre los elementos y verificar si están llenos
+  for (var i = 0; i < elementosFormulario.length; i++) {
+      // Verificar solo los elementos que son input, select o textarea
+      if (elementosFormulario[i].type !== 'submit' && elementosFormulario[i].type !== 'reset' && elementosFormulario[i].type !== 'button') {
+          if (elementosFormulario[i].value === '') {
+              console.log(elementosFormulario[i])
+              return false; // Evitar que el formulario se envíe
+          }
+      }
+  }
+
+  // Si todos los campos están llenos, permitir el envío del formulario
+  return true;
 }

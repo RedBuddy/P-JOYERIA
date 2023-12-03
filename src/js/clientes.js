@@ -40,18 +40,16 @@ function pintarHtml() {
     let divDatos = document.createElement('div');
 
     if (opcionClientesSeleccionada === 'agregar_cliente' || opcionClientesSeleccionada === 'editar_cliente') {
-        campos = ["Nombre", "RFC", "Telefono", "Correo", "Telefono", "Ciudad", "Credito_maximo"];
+        campos = ["Nombre", "RFC", "Telefono", "Correo", "Ciudad", "Direccion", "Credito_maximo"];
     } else if (opcionClientesSeleccionada === 'consultar_cliente') {
-        thTabla = ["ID", "NOMBRE", "RFC", "TELEFONO", "CORREO", "TELEFONO", "CIUDAD", "CREDITO_MAXIMO"];
+        thTabla = ["ID", "NOMBRE", "RFC", "TELEFONO", "CORREO", "CIUDAD", "CREDITO_MAXIMO"];
     }
-
-    console.log(campos)
     API(divDatos, campos, thTabla);
 
 }
 
 function crearFormularioNav(campos) {
-    let formulario = '<form action="" class="form">';
+    let formulario = '<form action="" class="form" name="nav">';
     campos.forEach(campo => {
         let titulo = formatText(campo);
         formulario += `
@@ -74,9 +72,15 @@ async function API(divDatos, campos, thTabla) {
         let btnRegistrar = document.querySelector('.form input[type="submit"]');
         btnRegistrar.addEventListener('click', (e) => {
             e.preventDefault();
-            const id = document.querySelector('.form input[type="text"]');
-            limpiarHtml();
-            eliminarDatosId(tipoTabla, id.value);
+            let formularioCorrecto = validarFormularioInput('nav');
+            console.log(formularioCorrecto);
+            if (formularioCorrecto) {
+                const id = document.querySelector('.form input[type="text"]');
+                limpiarHtml();
+                eliminarDatosId(tipoTabla, id.value);
+            } else {
+                swal('Llena el campo correspondiente', '', 'error');
+            }
         })
     } else if (accionTabla === "consultar") {
         console.log('hola');
@@ -92,7 +96,7 @@ async function API(divDatos, campos, thTabla) {
             }, "pageLength": 7,
         });
     } else if (accionTabla === "editar") {
-        console.log(campos)
+        console.log('hla');
         let div = document.createElement('div');
         div.classList.add('form-datos');
         let camposAux = ["Id_" + tipoTabla];
@@ -100,9 +104,15 @@ async function API(divDatos, campos, thTabla) {
         divPanel.append(div);
         let btnRegistrar = document.querySelector('.form input[type="submit"]');
         btnRegistrar.addEventListener('click', (e) => {
-            const id = document.querySelector('.form input[type="text"]');
-            limpiarHtml();
-            edicionDatos(e, campos, id.value);
+            let formularioCorrecto = validarFormularioInput('nav');
+            if (formularioCorrecto) {
+                console.log('hola');
+                const id = document.querySelector('.form input[type="text"]');
+                limpiarHtml();
+                edicionDatos(e, campos, id.value);
+            } else {
+                swal('Llena el campo correspondiente', '', 'error');
+            }
         })
     } else {
         crearFormulario(campos)
@@ -161,12 +171,17 @@ function obtenerDatos(tipoTabla) {
 
 async function tomarDatos(e) {
     e.preventDefault();
+    console.log('hola');
     const form = document.querySelector("#formulario-registro");
-    let hola = ponerDatos(form, tipoTabla);
+    let formularioCorrecto = validarFormularioInput('formulario-registro');
+    if (formularioCorrecto) {
+        swal('Cliente añadido correctamente', '', 'success');
+        let id = ponerDatos(form);
+    }
 }
 
 async function crearFormulario(campos) {
-    let formulario = `<form id="formulario-registro">`;
+    let formulario = `<form id="formulario-registro" name="formulario-registro">`;
 
     for (let campo of campos) {
         const textoLabel = formatText(campo);
@@ -176,6 +191,8 @@ async function crearFormulario(campos) {
 
         if (campo === 'fecha') {
             formulario += `<input type="date" name="${campo}" id="${campo}">`;
+        } else if (campo === 'Credito_maximo') {
+            formulario += `<input type="number" name="${campo}" id="${campo}">`;
         } else if (campo === 'Tipo') {
             formulario += generateSelectField(campo, [["_mp", "Materia prima"], ["_pt", "Producto terminado"]]);
         } else {
@@ -187,7 +204,7 @@ async function crearFormulario(campos) {
     return formulario;
 }
 
-function ponerDatos(form, tipoTabla) {
+function ponerDatos(form) {
     const form_data = new FormData(form);
     const data = new URLSearchParams(form_data);
 
@@ -195,6 +212,8 @@ function ponerDatos(form, tipoTabla) {
     form_data.forEach((clave, valor) => {
         console.log(clave, valor);
     })
+
+    console.log(`http://localhost:3000/${tipoTabla}`);
 
     fetch(`http://localhost:3000/${tipoTabla}`, {
         method: 'POST',
@@ -245,7 +264,8 @@ async function construirTabla(datos, thTabla) {
     const trHead = document.createElement('tr');
     thTabla.forEach((thText) => {
         const th = document.createElement('th');
-        th.textContent = thText;
+        let titulo = formatText(thText);
+        th.textContent = titulo;
         trHead.appendChild(th);
     });
     thead.appendChild(trHead);
@@ -288,7 +308,6 @@ async function edicionDatos(e, campos, id) {
 async function llenarFormulario(campos, id) {
     try {
         const datos = await obtenerDatosId(tipoTabla, id);
-        console.log(datos);
 
 
 
@@ -303,15 +322,15 @@ async function llenarFormulario(campos, id) {
         if (btnRegistrar) {
             btnRegistrar.addEventListener('click', async (e) => {
                 e.preventDefault();
-                try {
-                    // Maneja la promesa devuelta por actualizarDatos
-
-                    let form = document.querySelector("#formulario-registro");
+                console.log('hola');
+                const form = document.querySelector("#formulario-registro");
+                let formularioCorrecto = validarFormularioInput('formulario-registro');
+                console.log(formularioCorrecto)
+                if (formularioCorrecto) {
+                    swal('Cliente editado correctamente', '', 'success');
                     await actualizarDatos(form, tipoTabla, id);
-                    console.log('Datos actualizados con éxito');
-                } catch (error) {
-                    console.error('Error al actualizar datos:', error);
                 }
+
             });
         }
 
@@ -324,7 +343,7 @@ async function llenarFormulario(campos, id) {
 
 
 async function crearFormularioLlenado(campos, datos) {
-    let formulario = `<form id="formulario-registro">`;
+    let formulario = `<form id="formulario-registro" name="formulario-registro">`;
 
 
     for (const campo of campos) {
@@ -337,6 +356,8 @@ async function crearFormularioLlenado(campos, datos) {
 
         if (campo === 'fecha') {
             formulario += `<input type="date" name="${campo}" id="${campo}" value="${datos[posicion] || ''}">`;
+        } else if (campo === 'Credito_maximo') {
+            formulario += `<input type="number" name="${campo}" id="${campo}" value="${datos[posicion] || ''}">`;
         } else {
             formulario += `<input type="text" name="${campo}" id="${campo}" value="${datos[posicion] || ''}">`;
         }
@@ -420,7 +441,7 @@ function eliminarDatosId(tipoTabla, id) {
             })
             .then(data => {
                 // Resolver la promesa con los datos obtenidos (o mensaje)
-                console.log(data);
+                swal('El cliente se ha eliminado correctamente', '', 'error');
                 resolve(data);
             })
             .catch(error => {
@@ -428,4 +449,61 @@ function eliminarDatosId(tipoTabla, id) {
                 reject(error);
             });
     });
+}
+
+function validarFormularioInput(name) {
+    // Obtener todos los elementos del formulario
+    var elementosFormulario = document.forms[name].elements;
+    // Iterar sobre los elementos y verificar si están llenos
+    for (var i = 0; i < elementosFormulario.length; i++) {
+        // Verificar solo los elementos que son input, select o textarea
+        if (elementosFormulario[i].type !== 'submit' && elementosFormulario[i].type !== 'reset' && elementosFormulario[i].type !== 'button') {
+            if (elementosFormulario[i].value === '') {
+                swal('Llena todos los campos correctamente', '', 'error');
+
+                return false; // Evitar que el formulario se envíe
+            }
+        }
+        if (elementosFormulario[i].id === 'RFC') {
+            if (!validarRFC(elementosFormulario[i].value)) {
+                swal('RFC incorrecto', 'El RFC es incorrecto', 'error');
+                console.log('entro pero soy gay');
+                return false;
+            }
+        }
+        if (elementosFormulario[i].id === 'Telefono') {
+            if (!validarNumeroCelular(elementosFormulario[i].value)) {
+                swal('Telefono incorrecto', 'El telefono es incorrecto', 'error');
+                console.log('entro pero soy gay');
+                return false;
+            }
+        }
+        if (elementosFormulario[i].id === 'Correo') {
+            if (!validarCorreoElectronico(elementosFormulario[i].value)) {
+                swal('Correo electronico incorrecto', 'Asegurate que el correo electronico sea correcto', 'error');
+                console.log('entro pero soy gay');
+                return false;
+            }
+        }
+    }
+
+    // Si todos los campos están llenos, permitir el envío del formulario
+    return true;
+}
+
+function validarRFC(rfc) {
+    const regexRFC = /^[A-Z]{4}\d{6}[A-Z\d]{3}$/;
+    return regexRFC.test(rfc);
+}
+
+function validarNumeroCelular(numero) {
+    // Asumiendo un formato común de 10 dígitos para números de teléfono en tu región
+    const regexNumeroCelular = /^[0-9]{10}$/;
+    return regexNumeroCelular.test(numero);
+}
+
+function validarCorreoElectronico(correo) {
+    // Expresión regular básica para validar el formato de un correo electrónico
+    const regexCorreoElectronico = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    return regexCorreoElectronico.test(correo);
 }

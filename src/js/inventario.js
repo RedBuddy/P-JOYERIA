@@ -210,19 +210,28 @@ function pintarHtml() {
                 campos = ["Nombre"];
                 btnRegistrar.addEventListener('click', (e) => {
                     e.preventDefault();
-                    const tipoCategoriaSelect = document.getElementById('Tipo_categoria');
-                    tipoTabla += tipoCategoriaSelect.value;
-                    limpiarHtml();
-                    API(divDatos, campos, thTabla);
+                    let formularioCorrecto = validarFormularioInput('nav');
+                    if (formularioCorrecto) {
+                        const tipoCategoriaSelect = document.getElementById('Tipo_categoria');
+                        tipoTabla += tipoCategoriaSelect.value;
+                        limpiarHtml();
+                        API(divDatos, campos, thTabla);
+                    } else {
+                        swal('Algo salio mal', 'Llena el campo correspondiente', 'error');
+                    }
                 })
             } else {
                 btnRegistrar.addEventListener('click', (e) => {
                     e.preventDefault();
-                    const tipoCategoriaSelect = document.getElementById('Tipo_categoria');
-                    tipoTabla += tipoCategoriaSelect.value;
-                    limpiarHtml();
-                    API(divDatos, campos, thTabla);
-
+                    let formularioCorrecto = validarFormularioInput('nav');
+                    if (formularioCorrecto) {
+                        const tipoCategoriaSelect = document.getElementById('Tipo_categoria');
+                        tipoTabla += tipoCategoriaSelect.value;
+                        limpiarHtml();
+                        API(divDatos, campos, thTabla);
+                    } else {
+                        swal('Algo salio mal', 'Llena el campo correspondiente', 'error');
+                    }
                 })
             }
         }
@@ -240,9 +249,15 @@ async function API(divDatos, campos, thTabla) {
         let btnRegistrar = document.querySelector('.form input[type="submit"]');
         btnRegistrar.addEventListener('click', (e) => {
             e.preventDefault();
-            const id = document.querySelector('.form input[type="text"]');
-            limpiarHtml();
-            eliminarDatosId(tipoTabla, id.value);
+            let formularioCorrecto = validarFormularioInput('nav');
+            if (formularioCorrecto) {
+                const id = document.querySelector('.form input[type="text"]');
+                limpiarHtml();
+                eliminarDatosId(tipoTabla, id.value);
+                swal('Eliminado correctamente','','success');
+            } else {
+                swal('Algo salio mal', 'Llena el campo correspondiente', 'error');
+            }
         })
     } else if (accionTabla === "consultar") {
         let datos = await obtenerDatos(tipoTabla);
@@ -263,9 +278,17 @@ async function API(divDatos, campos, thTabla) {
         divPanel.append(div);
         let btnRegistrar = document.querySelector('.form input[type="submit"]');
         btnRegistrar.addEventListener('click', (e) => {
-            const id = document.querySelector('.form input[type="text"]');
-            limpiarHtml();
-            edicionDatos(e, campos, id.value);
+            e.preventDefault();
+            let formularioCorrecto = validarFormularioInput('nav');
+            console.log(formularioCorrecto);
+            if(formularioCorrecto){
+                const id = document.querySelector('.form input[type="text"]');
+                limpiarHtml();
+                edicionDatos(e, campos, id.value);
+            }else{
+                swal('Algo salio mal', 'Llena los campos correspondientes', 'error');
+            }
+            
         })
     } else {
         crearFormulario(campos)
@@ -280,7 +303,19 @@ async function API(divDatos, campos, thTabla) {
                 if (btnRegistrar) {
                     btnRegistrar.addEventListener('click', (e) => {
                         e.preventDefault();  // Prevenir el envío por defecto del formulario
-                        tomarDatos(e);
+                        
+                        let mensaje = formatText(tipoTabla);
+                        console.log(mensaje);
+                        if(mensaje === 'Materia prima'){
+                            mensaje = "La materia prima";
+                        }else if(mensaje === 'Producto terminado'){
+                            mensaje = "El producto terminado";
+                        }else if(mensaje === 'Almacen mp'){
+                            mensaje = "El movimiento del almacen de materia prima";
+                        }else if(mensaje === 'Almacen pt'){
+                            mensaje = "El movimiento del almacen de producto terminado";
+                        }
+                        tomarDatos(e, mensaje);
                     });
                 }
                 divPanel.append(divDatos);
@@ -314,15 +349,15 @@ async function llenarFormulario(campos, id) {
         if (btnRegistrar) {
             btnRegistrar.addEventListener('click', async (e) => {
                 e.preventDefault();
-                try {
-                    // Maneja la promesa devuelta por actualizarDatos
-
+                let formularioCorrecto = validarFormularioInput('formulario-registro');
+                if(formularioCorrecto){
                     let form = document.querySelector("#formulario-registro");
                     await actualizarDatos(form, tipoTabla, id);
-                    console.log('Datos actualizados con éxito');
-                } catch (error) {
-                    console.error('Error al actualizar datos:', error);
+                    swal('Datos actualizados correctamente','','success');
+                }else{
+                    swal('Algo salio mal','Llena los campos correspondientes','error');
                 }
+                
             });
         }
 
@@ -335,7 +370,7 @@ async function llenarFormulario(campos, id) {
 
 
 async function crearFormularioLlenado(campos, datos) {
-    let formulario = `<form id="formulario-registro">`;
+    let formulario = `<form id="formulario-registro" name="formulario-registro">`;
 
 
     for (const campo of campos) {
@@ -382,12 +417,17 @@ async function crearFormularioLlenado(campos, datos) {
 }
 
 
-async function tomarDatos(e) {
+async function tomarDatos(e, mensaje) {
     e.preventDefault();
-    const form = document.querySelector("#formulario-registro");
-    let hola = ponerDatos(form, tipoTabla);
-    console.log(hola);
-    agregarModal(hola);
+    let formularioCorrecto = validarFormularioInput('formulario-registro');
+    if(formularioCorrecto){
+        const form = document.querySelector("#formulario-registro");
+        console.log(tipoTabla);
+        ponerDatos(form, tipoTabla);
+        swal(`${mensaje} se ha guardado correctamente`, '', 'success');
+    }else{
+        swal('Algo salio mal', 'Llena todos los campos', 'error');
+    }
 }
 
 
@@ -525,12 +565,14 @@ function ponerDatos(form, tipoTabla) {
 
     const camposExcluidos = ['Tipo'];
 
-    form_data.forEach((value, key) => {
-        console.log(`Clave: ${key}, Valor: ${value}`);
-    });
+    form_data.forEach((campo,tipo) => {
+        if(tipo === 'Tipo'){
+            tipoTabla = 'categoria'+campo;
+        }
+    })
 
-
-    camposExcluidos.forEach(campo => {
+    
+    camposExcluidos.forEach((campo,valor) => {
         form_data.delete(campo);
     });
 
@@ -551,6 +593,9 @@ function ponerDatos(form, tipoTabla) {
             return data;
         })
         .catch(error => {
+            if(tipoTabla === 'actualizar_almacen' || tipoTabla === 'actualizar_almacen_pt'){
+                swal('No hay suficiente cantidad en el almacen', '', 'error');
+            }
             console.error(error); // Agregar esta línea para ver el error en la consola
         });
 }
@@ -581,7 +626,7 @@ function agregarModal(id) {
 
 
 function crearFormularioNav(campos) {
-    let formulario = '<form action="" class="form">';
+    let formulario = '<form action="" class="form" name="nav">';
     campos.forEach(campo => {
         let titulo = formatText(campo);
         let input = `<input type="text" name="${campo}" id="${campo}" class=""></input>`
@@ -599,7 +644,7 @@ function crearFormularioNav(campos) {
 }
 
 async function crearFormulario(campos) {
-    let formulario = `<form id="formulario-registro">`;
+    let formulario = `<form id="formulario-registro" name="formulario-registro">`;
 
     for (let campo of campos) {
         const textoLabel = formatText(campo);
@@ -611,8 +656,9 @@ async function crearFormulario(campos) {
         }
 
         formulario += `<label for="${campo}">${textoLabel}</label>`;
-
-        if (campo === 'fecha') {
+        if(campo === 'Precio_de_compra' || campo === 'Precio_venta'){
+            formulario += `<input type="number" name="${campo}" id="${campo}">`;
+        }else if (campo === 'fecha') {
             formulario += `<input type="date" name="${campo}" id="${campo}">`;
         } else if (campo === 'Tipo') {
             formulario += generateSelectField(campo, [["_mp", "Materia prima"], ["_pt", "Producto terminado"]]);
@@ -704,7 +750,8 @@ async function construirTabla(datos, thTabla) {
     const trHead = document.createElement('tr');
     thTabla.forEach((thText) => {
         const th = document.createElement('th');
-        th.textContent = thText;
+        let titulo = formatText(thText);
+        th.textContent = titulo;
         trHead.appendChild(th);
     });
     thead.appendChild(trHead);
@@ -737,4 +784,22 @@ async function construirTabla(datos, thTabla) {
     div.append(tabla);
     // Limpiar y añadir la tabla al contenedor
     return div;
+}
+
+function validarFormularioInput(name) {
+    // Obtener todos los elementos del formulario
+    var elementosFormulario = document.forms[name].elements;
+    // Iterar sobre los elementos y verificar si están llenos
+    for (var i = 0; i < elementosFormulario.length; i++) {
+        // Verificar solo los elementos que son input, select o textarea
+        if (elementosFormulario[i].type !== 'submit' && elementosFormulario[i].type !== 'reset' && elementosFormulario[i].type !== 'button') {
+            if (elementosFormulario[i].value === '') {
+                console.log(elementosFormulario[i])
+                return false; // Evitar que el formulario se envíe
+            }
+        }
+    }
+
+    // Si todos los campos están llenos, permitir el envío del formulario
+    return true;
 }
