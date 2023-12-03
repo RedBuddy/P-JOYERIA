@@ -3,6 +3,16 @@ let panelGarantias = document.querySelector('.panel .nav-sup');
 let divPanel = document.querySelector('.panel');
 let opcionGarantiasSeleccionada;
 
+//Verificacion de permiso para el subsistema
+import { verificar_permiso_subsistema, verificar_permiso_modulo, contenido_denegado } from "./loggin.js";
+let nombreHtml = window.location.pathname.split("/").pop();
+const nivel_acceso = localStorage.getItem('nivel_acceso');
+
+if (!verificar_permiso_subsistema(nivel_acceso, nombreHtml.split('.')[0])) {
+    contenido_denegado();
+}
+//
+
 opcionesGarantias.forEach((opcion) => {
     opcion.addEventListener('click', e => {
         e.preventDefault();
@@ -14,10 +24,20 @@ opcionesGarantias.forEach((opcion) => {
             opcionGarantiasSeleccionada = 'consultar-garantias';
         } else if (opcionSeleccionada.contains('registrar-devolucion-cliente')) {
             opcionGarantiasSeleccionada = 'registrar-devolucion-clientes';
-        }else if (opcionSeleccionada.contains('registrar-devolucion-proveedor')) {
+        } else if (opcionSeleccionada.contains('registrar-devolucion-proveedor')) {
             opcionGarantiasSeleccionada = 'registrar-devolucion-proveedores';
         }
-        pintarHtml();
+
+        //verificar permiso
+        if (!verificar_permiso_modulo(nivel_acceso, opcionGarantiasSeleccionada, nombreHtml.split('.')[0])) {
+            contenido_denegado();
+            console.log(nivel_acceso)
+            console.log(opcionGarantiasSeleccionada)
+            console.log(nombreHtml.split('.')[0])
+        } else {
+            pintarHtml();
+        }
+
     });
 });
 
@@ -71,13 +91,13 @@ function pintarHtml() {
 `;
         tablas.appendChild(tabla);
         divPanel.appendChild(tablas);
-    }else if(opcionGarantiasSeleccionada === 'registrar-devolucion-clientes'){
-        campos = ["id-garantia", "motivo-devolucion", "estado-producto", "acciones-tomar","fecha-devolucion"];
+    } else if (opcionGarantiasSeleccionada === 'registrar-devolucion-clientes') {
+        campos = ["id-garantia", "motivo-devolucion", "estado-producto", "acciones-tomar", "fecha-devolucion"];
         divDatos.classList.add('formulario', 'registrar-devolucion-clientes');
         divDatos.innerHTML = crearFormulario(campos, "formulario-registro");
         divPanel.appendChild(divDatos);
-    }else if(opcionGarantiasSeleccionada === 'registrar-devolucion-proveedores'){
-        campos = ["fecha-devolucion", "proveedor", "id-compra","productos","motivo-devolucion","estado-producto","acciones-tomar","responsable-devolucion","costo-devolucion"];
+    } else if (opcionGarantiasSeleccionada === 'registrar-devolucion-proveedores') {
+        campos = ["fecha-devolucion", "proveedor", "id-compra", "productos", "motivo-devolucion", "estado-producto", "acciones-tomar", "responsable-devolucion", "costo-devolucion"];
         divDatos.classList.add('formulario', 'registrar-devolucion-clientes');
         divDatos.innerHTML = crearFormulario(campos, "formulario-registro");
         divPanel.appendChild(divDatos);

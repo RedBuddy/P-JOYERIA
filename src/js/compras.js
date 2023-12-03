@@ -3,10 +3,18 @@ let divPanel = document.querySelector('.panel');
 let opcionCompraSeleccionada;
 let tipoTabla;
 let accionTabla;
-
 let productosComprasAcumuladas = [];
-
 let objetoForm;
+
+//Verificacion de permiso para el subsistema
+import { verificar_permiso_subsistema, verificar_permiso_modulo, contenido_denegado } from "./loggin.js";
+let nombreHtml = window.location.pathname.split("/").pop();
+const nivel_acceso = localStorage.getItem('nivel_acceso');
+
+if (!verificar_permiso_subsistema(nivel_acceso, nombreHtml.split('.')[0])) {
+    contenido_denegado();
+}
+//
 
 opcionesCompra.forEach((opcion) => {
     opcion.addEventListener('click', e => {
@@ -62,7 +70,7 @@ async function API(divDatos, campos, thTabla) {
 
         let productos = await obtenerDatos('materia_prima')
 
-        
+
         divPanel.append(div);//aqui yo tengo eso
         //INICIALIZO LA TABLA SIN NADA PARA PONER EL FORM
 
@@ -115,7 +123,7 @@ async function API(divDatos, campos, thTabla) {
             if (quitarTabla) {
                 quitarTabla.remove();
             }
-            
+
             divPanel.append(divDatos);
             divPanel.append(await construirTabla(divDatos, datos, thTabla, null, valor));
             console.log(datos);
@@ -368,7 +376,7 @@ function obtenerDatos(tipoTabla, id) {
             tipoTabla = `${tipoTabla}/${id}`;
         }
         console.log(tipoTabla)
-    console.log(`Enviando solicitud a http://localhost:3000/${tipoTabla}`);
+        console.log(`Enviando solicitud a http://localhost:3000/${tipoTabla}`);
 
         // Realizar una solicitud GET a la API
         fetch(`http://localhost:3000/${tipoTabla}`, {

@@ -5,6 +5,16 @@ let opcionClientesSeleccionada;
 let tipoTabla;
 let accionTabla;
 
+//Verificacion de permiso para el subsistema
+import { verificar_permiso_subsistema, verificar_permiso_modulo, contenido_denegado } from "./loggin.js";
+let nombreHtml = window.location.pathname.split("/").pop();
+const nivel_acceso = localStorage.getItem('nivel_acceso');
+
+if (!verificar_permiso_subsistema(nivel_acceso, nombreHtml.split('.')[0])) {
+    contenido_denegado();
+}
+//
+
 opcionesClientes.forEach((opcion) => {
     opcion.addEventListener('click', e => {
         e.preventDefault();
@@ -30,9 +40,9 @@ function pintarHtml() {
     let divDatos = document.createElement('div');
 
     if (opcionClientesSeleccionada === 'agregar_cliente' || opcionClientesSeleccionada === 'editar_cliente') {
-        campos = ["Nombre","RFC", "Telefono", "Correo", "Telefono", "Ciudad", "Credito_maximo"];
-    }else if(opcionClientesSeleccionada === 'consultar_cliente'){
-        thTabla = ["ID","NOMBRE","RFC","TELEFONO","CORREO","TELEFONO","CIUDAD","CREDITO_MAXIMO"];
+        campos = ["Nombre", "RFC", "Telefono", "Correo", "Telefono", "Ciudad", "Credito_maximo"];
+    } else if (opcionClientesSeleccionada === 'consultar_cliente') {
+        thTabla = ["ID", "NOMBRE", "RFC", "TELEFONO", "CORREO", "TELEFONO", "CIUDAD", "CREDITO_MAXIMO"];
     }
 
     console.log(campos)
@@ -54,7 +64,7 @@ function crearFormularioNav(campos) {
     return formulario;
 }
 
-async function API(divDatos, campos, thTabla){
+async function API(divDatos, campos, thTabla) {
     if (accionTabla === "eliminar") {
         let div = document.createElement('div');
         div.classList.add('form-datos');
@@ -183,7 +193,7 @@ function ponerDatos(form, tipoTabla) {
 
 
     form_data.forEach((clave, valor) => {
-        console.log(clave,valor);
+        console.log(clave, valor);
     })
 
     fetch(`http://localhost:3000/${tipoTabla}`, {

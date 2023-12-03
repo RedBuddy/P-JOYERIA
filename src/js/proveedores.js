@@ -5,6 +5,16 @@ let opcionProveedoresSeleccionada;
 let tipoTabla;
 let accionTabla;
 
+//Verificacion de permiso para el subsistema
+import { verificar_permiso_subsistema, verificar_permiso_modulo, contenido_denegado } from "./loggin.js";
+let nombreHtml = window.location.pathname.split("/").pop();
+const nivel_acceso = localStorage.getItem('nivel_acceso');
+
+if (!verificar_permiso_subsistema(nivel_acceso, nombreHtml.split('.')[0])) {
+    contenido_denegado();
+}
+//
+
 opcionesProveedores.forEach((opcion) => {
     opcion.addEventListener('click', e => {
         e.preventDefault();
@@ -33,9 +43,9 @@ function pintarHtml() {
     let divDatos = document.createElement('div');
 
     if (opcionProveedoresSeleccionada === 'registrar_proveedor' || opcionProveedoresSeleccionada === 'editar_proveedor') {
-        campos = ["Nombre","Representante", "RFC", "Correo_electronico", "Celular", "Numero_exterior", "Codigo_postal", "Ciudad", "Estado", "Limite_de_credito", "Dias_de_credito", "Domicilio"];
-    }else if(opcionProveedoresSeleccionada === 'consultar_proveedor'){
-        thTabla = ["ID","NOMBRE","REPRESENTANTE","CORREO_ELECTRONICO","CELULAR","LIMITE_DE_CREDITO","DIAS_DE_CREDITO"];
+        campos = ["Nombre", "Representante", "RFC", "Correo_electronico", "Celular", "Numero_exterior", "Codigo_postal", "Ciudad", "Estado", "Limite_de_credito", "Dias_de_credito", "Domicilio"];
+    } else if (opcionProveedoresSeleccionada === 'consultar_proveedor') {
+        thTabla = ["ID", "NOMBRE", "REPRESENTANTE", "CORREO_ELECTRONICO", "CELULAR", "LIMITE_DE_CREDITO", "DIAS_DE_CREDITO"];
     }
 
     API(divDatos, campos, thTabla);
@@ -56,7 +66,7 @@ function crearFormularioNav(campos) {
     return formulario;
 }
 
-async function API(divDatos, campos, thTabla){
+async function API(divDatos, campos, thTabla) {
     if (accionTabla === "eliminar") {
         let div = document.createElement('div');
         div.classList.add('form-datos');
@@ -185,7 +195,7 @@ function ponerDatos(form, tipoTabla) {
 
 
     form_data.forEach((clave, valor) => {
-        console.log(clave,valor);
+        console.log(clave, valor);
     })
 
     fetch(`http://localhost:3000/${tipoTabla}`, {

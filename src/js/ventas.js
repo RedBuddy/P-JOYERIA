@@ -3,10 +3,18 @@ let divPanel = document.querySelector('.panel');
 let opcionVentaSeleccionada;
 let tipoTabla;
 let accionTabla;
-
 let productosVentasAcumuladas = [];
-
 let objetoForm;
+
+//Verificacion de permiso para el subsistema
+import { verificar_permiso_subsistema, verificar_permiso_modulo, contenido_denegado } from "./loggin.js";
+let nombreHtml = window.location.pathname.split("/").pop();
+const nivel_acceso = localStorage.getItem('nivel_acceso');
+
+if (!verificar_permiso_subsistema(nivel_acceso, nombreHtml.split('.')[0])) {
+  contenido_denegado();
+}
+//
 
 opcionesVenta.forEach((opcion) => {
   opcion.addEventListener('click', e => {
@@ -21,7 +29,7 @@ opcionesVenta.forEach((opcion) => {
       opcionVentaSeleccionada = 'historial_venta';
       tipoTabla = 'venta';
       accionTabla = 'consultar';
-    } else if(opcionSeleccionada.contains('registrar_abono')){
+    } else if (opcionSeleccionada.contains('registrar_abono')) {
       opcionVentaSeleccionada = 'registrar_abono';
       tipoTabla = 'venta';
       accionTabla = 'agregar';
@@ -42,7 +50,7 @@ function pintarHtml() {
     campos = ["Tipo_venta"];
     thTabla = ["ID", "FECHA_DE_VENTA", "MONTO_TOTAL", "MONTO_PAGADO", "ESTATUS", "NUMERO_MENSUALIDADES", "MONTO_MENSUALIDAD", "FECHA_PROXIMO_PAGO"]
     API(divDatos, campos, thTabla);
-  }else if(opcionVentaSeleccionada === 'registrar_abono'){
+  } else if (opcionVentaSeleccionada === 'registrar_abono') {
     campos = ["Id"];
     API(divDatos, campos, thTabla);
   }
@@ -132,7 +140,7 @@ async function API(divDatos, campos, thTabla) {
       if (valor === 'Contado') {
         thTabla = ["ID", "FECHA_DE_VENTA", "MONTO_TOTAL"];
       } else {
-        thTabla = ["ID", "FECHA_DE_VENTA", "MONTO_TOTAL", "MONTO_PAGADO", "ESTATUS", "NUMERO_MENSUALIDADES", "MONTO_MENSUALIDAD", "FECHA_PROXIMO_PAGO","MENSUALIDADES_PAGADAS"]
+        thTabla = ["ID", "FECHA_DE_VENTA", "MONTO_TOTAL", "MONTO_PAGADO", "ESTATUS", "NUMERO_MENSUALIDADES", "MONTO_MENSUALIDAD", "FECHA_PROXIMO_PAGO", "MENSUALIDADES_PAGADAS"]
       }
       //REMOVER EL ELEMENTO
       let quitarTabla = document.querySelector('.panel .tablas .no-footer');
@@ -152,7 +160,7 @@ async function API(divDatos, campos, thTabla) {
       });
     })
 
-  } else if(accionTabla === 'agregar' && opcionVentaSeleccionada === 'registrar_abono') {
+  } else if (accionTabla === 'agregar' && opcionVentaSeleccionada === 'registrar_abono') {
     let div = document.createElement('div');
     div.classList.add('form-datos');
     div.innerHTML = crearFormularioNav(campos);
@@ -161,11 +169,11 @@ async function API(divDatos, campos, thTabla) {
     let input = document.querySelector('.panel .form-datos input');
 
     let btnBuscar = document.querySelector('.panel .form-datos input[type="submit"]');
-    btnBuscar.addEventListener('click' , async (e) => {
+    btnBuscar.addEventListener('click', async (e) => {
       e.preventDefault();
       limpiarHMTL();
       let datosVenta = await obtenerDatos('venta', input.value);
-      campos = ["Monto_total","Monto_pagado","Fecha_proximo_pago","Monto_mensualidad"];
+      campos = ["Monto_total", "Monto_pagado", "Fecha_proximo_pago", "Monto_mensualidad"];
 
       let divDatos = document.createElement('div');
       divDatos.classList.add('tablas');
@@ -186,10 +194,10 @@ function colocarTotal() {
   inputTotal.value = sumaTotal;
 }
 
-function construirFormVenta(campos,datosVenta, id) {
-  if(opcionVentaSeleccionada === 'registrar_venta'){
+function construirFormVenta(campos, datosVenta, id) {
+  if (opcionVentaSeleccionada === 'registrar_venta') {
     tipoTabla = 'clientes';
-  }else{
+  } else {
     productosVentasAcumuladas = datosVenta;
   }
   crearFormularioLlenado(campos, productosVentasAcumuladas, id)
@@ -205,9 +213,9 @@ function construirFormVenta(campos,datosVenta, id) {
       btnRegistrar.addEventListener('click', (e) => {
         e.preventDefault();
         let form = document.getElementById('formulario-registro');
-        if(opcionVentaSeleccionada === 'registrar_venta'){
+        if (opcionVentaSeleccionada === 'registrar_venta') {
           validarFormulario(form);
-        }else {
+        } else {
           let montoAbonado = document.getElementById('Monto_mensualidad').value;
           const fecha = new Date();
           const formatoFecha = fecha.toISOString().slice(0, 10);
@@ -215,7 +223,7 @@ function construirFormVenta(campos,datosVenta, id) {
           objetoForm["Id_venta_credito"] = id;
           objetoForm["Monto_abono"] = montoAbonado;
           objetoForm["Fecha_abono"] = formatoFecha;
-          console.log(objetoForm) 
+          console.log(objetoForm)
           ponerDatos();
         }
 
@@ -265,13 +273,13 @@ function construirTabla(div, datos, thTabla, productosAVender, tipoVenta) {
       thTabla.forEach((columna) => {
         const td = document.createElement('td');
         if (columna === 'FECHA_DE_VENTA' || columna === 'FECHA_PROXIMO_PAGO') {
-          
-          if(objeto[columna]){
+
+          if (objeto[columna]) {
             console.log(objeto[columna]);
-          let fechaAPI = objeto[columna];
-          // Obtener solo la parte de la fecha con slice
-          let fechaFormateada = fechaAPI.slice(0, 10);
-          td.textContent = fechaFormateada;
+            let fechaAPI = objeto[columna];
+            // Obtener solo la parte de la fecha con slice
+            let fechaFormateada = fechaAPI.slice(0, 10);
+            td.textContent = fechaFormateada;
           }
         } else {
           td.textContent = objeto[columna];
@@ -373,7 +381,7 @@ function obtenerDatos(tipoTabla, id) {
   return new Promise((resolve, reject) => {
     const arregloDatos = [];
 
-    if(id){
+    if (id) {
       tipoTabla = `${tipoTabla}/${id}`;
     }
     console.log(tipoTabla)
@@ -388,15 +396,15 @@ function obtenerDatos(tipoTabla, id) {
         return response.json();
       })
       .then(data => {
-        if(id){
+        if (id) {
           resolve(data);
-        }else{
+        } else {
           data.forEach(item => {
             if (tipoTabla === 'clientes') {
               const cadena = `${item.NOMBRE}`;
               arregloDatos.push([item.ID, cadena]);
             } else {
-  
+
               arregloDatos.push(item);
             }
           });
@@ -516,8 +524,8 @@ async function crearFormularioLlenado(campos, datos) {
     formulario += `<label for="${campo}">${textoLabel}</label>`;
 
     let posicion = campo.toUpperCase();
-    let fechaFormateada ;
-    if(campo === 'Fecha_de_venta' || campo === 'Fecha_proximo_pago'){
+    let fechaFormateada;
+    if (campo === 'Fecha_de_venta' || campo === 'Fecha_proximo_pago') {
       let fechaAPI = datos[posicion];
       // Obtener solo la parte de la fecha con slice
       fechaFormateada = fechaAPI.slice(0, 10);
@@ -539,11 +547,11 @@ async function crearFormularioLlenado(campos, datos) {
       formulario += generateSelectField(campo, opciones);
     } else if (campo === 'Monto_total') {
       formulario += `<input type="text" name="${campo}" id="${campo}"  value="${datos[posicion] || ''}" disabled >`;
-    } else if(campo === 'Fecha_de_venta' || campo === 'Fecha_proximo_pago'){
+    } else if (campo === 'Fecha_de_venta' || campo === 'Fecha_proximo_pago') {
       formulario += `<input type="date" name="${campo}" id="${campo}" value="${fechaFormateada || ''}" disabled >`
-    }else if(campo === 'Monto_pagado'){
+    } else if (campo === 'Monto_pagado') {
       formulario += `<input  type="number" name="${campo}" id="${campo}" value="${datos[posicion]}" disabled>`;
-    }else if(campo === 'Monto_mensualidad'){
+    } else if (campo === 'Monto_mensualidad') {
       formulario += `<input type="number" name="${campo}" id="${campo}" placeholder="La cantidad minima a pagar es de ${datos[posicion]}" min="${datos[posicion]}">`;
     }
     else {
@@ -720,9 +728,9 @@ function objetosForm(form) {
 
 async function ponerDatos() {
   console.log(objetoForm);
-  if(opcionVentaSeleccionada === 'registrar_venta'){
+  if (opcionVentaSeleccionada === 'registrar_venta') {
     tipoTabla = 'RegistrarVentaConDetalles';
-  }else if(opcionVentaSeleccionada === 'registrar_abono'){
+  } else if (opcionVentaSeleccionada === 'registrar_abono') {
     tipoTabla = 'registrar_abono_venta';
   }
   console.log(`Enviando solicitud a http://localhost:3000/${tipoTabla}`);

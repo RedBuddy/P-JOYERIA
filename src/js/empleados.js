@@ -3,6 +3,16 @@ let panelEmpleados = document.querySelector('.panel .nav-sup');
 let divPanel = document.querySelector('.panel');
 let opcionEmpleadosSeleccionada;
 
+//Verificacion de permiso para el subsistema
+import { verificar_permiso_subsistema, verificar_permiso_modulo, contenido_denegado } from "./loggin.js";
+let nombreHtml = window.location.pathname.split("/").pop();
+const nivel_acceso = localStorage.getItem('nivel_acceso');
+
+if (!verificar_permiso_subsistema(nivel_acceso, nombreHtml.split('.')[0])) {
+    contenido_denegado();
+}
+//
+
 opcionesEmpleados.forEach((opcion) => {
     opcion.addEventListener('click', e => {
         e.preventDefault();
@@ -28,9 +38,9 @@ function pintarHtml() {
     let divDatos = document.createElement('div');
 
     if (opcionEmpleadosSeleccionada === 'agregar_empleado' || opcionEmpleadosSeleccionada === 'editar_empleado') {
-        campos = ["Nombre","RFC", "Celular", "Puesto", "Fecha_ingreso", "Turno", "Salario_hora","Correo","Fecha_nacimiento","Direccion","Activo"];
-    }else if(opcionEmpleadosSeleccionada === 'consultar_empleado'){
-        thTabla = ["ID","NOMBRE","RFC", "CELULAR", "PUESTO", "FECHA_INGRESO", "TURNO", "SALARIO_HORA","CORREO","FECHA_NACIMIENTO","DIRECCION","ACTIVO"];
+        campos = ["Nombre", "RFC", "Celular", "Puesto", "Fecha_ingreso", "Turno", "Salario_hora", "Correo", "Fecha_nacimiento", "Direccion", "Activo"];
+    } else if (opcionEmpleadosSeleccionada === 'consultar_empleado') {
+        thTabla = ["ID", "NOMBRE", "RFC", "CELULAR", "PUESTO", "FECHA_INGRESO", "TURNO", "SALARIO_HORA", "CORREO", "FECHA_NACIMIENTO", "DIRECCION", "ACTIVO"];
     }
 
     API(divDatos, campos, thTabla);
@@ -51,7 +61,7 @@ function crearFormularioNav(campos) {
     return formulario;
 }
 
-async function API(divDatos, campos, thTabla){
+async function API(divDatos, campos, thTabla) {
     if (accionTabla === "eliminar") {
         let div = document.createElement('div');
         div.classList.add('form-datos');
@@ -164,8 +174,8 @@ async function crearFormulario(campos) {
         if (campo === 'Fecha_ingreso') {
             formulario += `<input type="date" name="${campo}" id="${campo}">`;
         } else if (campo === 'Puesto') {
-            const opciones = [["Gerente", "Gerente"], ["Vendedor", "Vendedor"],["Almacenista","Almacenista"],["Asistente de ventas","Asistente de ventas"],["Comprador","Comprador"]];
-            formulario += generateSelectField(campo, opciones,  tipoTabla);
+            const opciones = [["Gerente", "Gerente"], ["Vendedor", "Vendedor"], ["Almacenista", "Almacenista"], ["Asistente de ventas", "Asistente de ventas"], ["Comprador", "Comprador"]];
+            formulario += generateSelectField(campo, opciones, tipoTabla);
         } else if (campo === 'Turno') {
             formulario += generateSelectField(campo, [["Matutino", "Matutino"], ["Vespertino", "Vespertino"]]);
         } else {
@@ -183,7 +193,7 @@ function ponerDatos(form, tipoTabla) {
 
 
     form_data.forEach((clave, valor) => {
-        console.log(clave,valor);
+        console.log(clave, valor);
     })
 
     fetch(`http://localhost:3000/${tipoTabla}`, {
