@@ -61,6 +61,7 @@ function generarNav(opcion) {
         return `
         <a class="nav-sup-link consultar_${opcion}" href="#"><img src="../src/img/almacen.png" alt="" class="consultar_${opcion}">Consultar almacen</a>
         <a class="nav-sup-link movimiento_${opcion}" href="#"><img src="../src/img/entrada.png" alt="" class="movimiento_${opcion}">Registrar movimiento</a>
+        <a class="nav-sup-link movimientos_${opcion}" href="#"><img src="../src/img/entradas_salidas.png" alt="" class="movimientos_${opcion}">Entradas y salidas de almacen</a>
         `;
     }
     titulo = formatText(opcion).toLowerCase();
@@ -137,7 +138,13 @@ function agregarEventListeners() {
             } else if (opcionSeleccionada.contains('eliminar_producto_terminado')) {
                 opcionInventarioSeleccionada = 'eliminar_producto_terminado';
                 accionTabla = "eliminar";
-            }
+            }else if (opcionSeleccionada.contains('movimientos_almacen_pt')) {
+                opcionInventarioSeleccionada = 'movimientos_almacen_pt';
+                accionTabla = "consultar";
+            } else if (opcionSeleccionada.contains('movimientos_almacen_mp')) {
+                opcionInventarioSeleccionada = 'movimientos_almacen_mp';
+                accionTabla = "consultar";
+            } 
             console.log(opcionInventarioSeleccionada);
             pintarHtml();
         });
@@ -146,8 +153,13 @@ function agregarEventListeners() {
 
 function pintarHtml() {
     //LA CATEGORIA ES EL UNICO SUBSISTEMA QUE CAMBIA 
+    limpiarHtml();
     if (tipoTabla === 'categoria_mp' || tipoTabla === 'categoria_pt') {
         tipoTabla = 'categoria';
+    }else if(tipoTabla === 'transacciones_almacen_mp'){
+        tipoTabla = 'almacen_mp';
+    }else if(tipoTabla === 'transacciones_almacen_pt'){
+        tipoTabla = 'almacen_pt';
     }
 
     let divDatos = document.createElement('div');
@@ -169,6 +181,9 @@ function pintarHtml() {
             campos = ["Id_materia_prima", "Cantidad", "Tipo_movimiento", "Motivo"];
         } else if (opcionInventarioSeleccionada === "consultar_almacen_mp") {
             thTabla = ["ID_MATERIA_PRIMA", "CANTIDAD"];
+        }else {
+            thTabla = ["ID","ID_MP","TIPO_MOVIMIENTO","CANTIDAD","FECHA","MOTIVO"];
+            tipoTabla = "transacciones_almacen_mp";
         }
         API(divDatos, campos, thTabla);
     }
@@ -178,6 +193,10 @@ function pintarHtml() {
             campos = ["Id_producto", "Cantidad", "Tipo_movimiento", "Motivo"];
         } else if (opcionInventarioSeleccionada === "consultar_almacen_pt") {
             thTabla = ["ID_PRODUCTO", "CANTIDAD"];
+        }else {
+            console.log('gola');
+            thTabla = ["ID","ID_PT","TIPO_MOVIMIENTO","CANTIDAD","FECHA","MOTIVO"];
+            tipoTabla = "transacciones_almacen_pt";
         }
         API(divDatos, campos, thTabla);
     }
@@ -253,7 +272,7 @@ async function API(divDatos, campos, thTabla) {
             if (formularioCorrecto) {
                 const id = document.querySelector('.form input[type="text"]');
                 limpiarHtml();
-                eliminarDatosId(tipoTabla, id.value);
+                eliminarDatosId(id.value);
                 swal('Eliminado correctamente','','success');
             } else {
                 swal('Algo salio mal', 'Llena el campo correspondiente', 'error');
@@ -261,6 +280,7 @@ async function API(divDatos, campos, thTabla) {
         })
     } else if (accionTabla === "consultar") {
         let datos = await obtenerDatos(tipoTabla);
+        console.log(datos);
         divPanel.append(divDatos);
         divPanel.append(await construirTabla(datos, thTabla));
         $('.tabla').DataTable({
@@ -370,11 +390,17 @@ async function llenarFormulario(campos, id) {
 
 
 async function crearFormularioLlenado(campos, datos) {
-    let formulario = `<form id="formulario-registro" name="formulario-registro">`;
+    let formulario = `<form id="formulario-registro" name="formulario-registro" autocomplete="off">`;
 
 
     for (const campo of campos) {
-        const textoLabel = formatText(campo);
+        let textoLabel = formatText(campo);
+
+        if(textoLabel === "Id categoria"){
+            textoLabel = "Categoria";
+        }else if(textoLabel === "Id proveedor"){
+            textoLabel = "Proveedor";
+        }
 
         formulario += `<label for="${campo}">${textoLabel}</label>`;
 
@@ -491,7 +517,7 @@ function obtenerDatosId(tipoTabla, id) {
     });
 }
 
-function eliminarDatosId(tipoTabla, id) {
+function eliminarDatosId(id) {
     console.log(tipoTabla)
     return new Promise((resolve, reject) => {
         // Realizar una solicitud DELETE a la API con el ID proporcionado
@@ -511,7 +537,13 @@ function eliminarDatosId(tipoTabla, id) {
                 resolve(data);
             })
             .catch(error => {
-                // Rechazar la promesa en caso de error
+                if(tipoTabla === 'materia_prima'){
+                    swal(`La materia prima no puede ser eliminada`, 'Verifica el estado en el sistema','error');
+                }else if(tipoTabla === 'producto_terminado'){                    
+                    swal(`El producto terminado no puede ser eliminado`, 'Verifica el estado en el sistema','error');
+                }else if(tipoTabla === 'categoria_pt' || tipoTabla === 'categoria_mp'){
+                    swal(`La categoria no puede ser eliminada`, 'Verifica el estado en el sistema','error');
+                }
                 reject(error);
             });
     });
@@ -626,12 +658,14 @@ function agregarModal(id) {
 
 
 function crearFormularioNav(campos) {
-    let formulario = '<form action="" class="form" name="nav">';
+    let formulario = '<form action="" class="form" name="nav" autocomplete="off">';
     campos.forEach(campo => {
         let titulo = formatText(campo);
         let input = `<input type="text" name="${campo}" id="${campo}" class=""></input>`
         if (tipoTabla === 'categoria') {
             input = generateSelectField(campo, [['_mp', 'Materia prima'], ['_pt', 'Producto terminado']])
+        }else if(campo === 'Id_materia_prima' || campo === 'Id_producto_terminado'){
+            input = `<input type="number" name="${campo}" id="${campo}" class=""></input>`
         }
         formulario += `
         <label for="${campo}">${titulo}</label>
@@ -644,10 +678,18 @@ function crearFormularioNav(campos) {
 }
 
 async function crearFormulario(campos) {
-    let formulario = `<form id="formulario-registro" name="formulario-registro">`;
+    let formulario = `<form id="formulario-registro" name="formulario-registro" autocomplete="off">`;
 
     for (let campo of campos) {
-        const textoLabel = formatText(campo);
+        let textoLabel = formatText(campo);
+
+        if(textoLabel === "Id categoria"){
+            textoLabel = "Categoria";
+        }else if(textoLabel === "Id proveedor"){
+            textoLabel = "Proveedor";
+        }else if(textoLabel === 'Id materia prima'){
+            textoLabel = 'Materia prima';
+        }
 
         if (tipoTabla === 'almacen_mp' && campo === 'Id_materia_prima' && accionTabla === 'agregar') {
             campo = "ID_MP";
@@ -663,7 +705,7 @@ async function crearFormulario(campos) {
         } else if (campo === 'Tipo') {
             formulario += generateSelectField(campo, [["_mp", "Materia prima"], ["_pt", "Producto terminado"]]);
         } else if (campo === 'Tipo_movimiento') {
-            const opciones = [["ENTRADA", "Entrada"], ["SALIDA", "Salida"]];
+            const opciones = [["entrada", "Entrada"], ["salida", "Salida"]];
             formulario += generateSelectField(campo, opciones, tipoTabla);
         } else if (campo === 'Unidad_de_medida') {
             formulario += generateSelectField(campo, [['Gramos', 'Gramos'], ['Pieza', 'Pieza']]);
@@ -741,6 +783,12 @@ function generateSelectField(fieldName, options, selectedValue) {
 }
 
 async function construirTabla(datos, thTabla) {
+    let quitarTabla = document.querySelector('.panel .tablas .tabla');
+    if (quitarTabla) {
+        quitarTabla.remove();
+    }else{
+        console.log('hola');
+    }
     const div = document.createElement('div');
     div.classList.add('tablas');
     const tabla = document.createElement('table');
@@ -765,7 +813,16 @@ async function construirTabla(datos, thTabla) {
             const tr = document.createElement('tr');
             thTabla.forEach((columna) => {
                 const td = document.createElement('td');
-                td.textContent = fila[columna];  // Utilizar directamente la columna como clave
+                if (columna === 'FECHA') {
+                    if (fila[columna]) {
+                        let fechaAPI = fila[columna];
+                        // Obtener solo la parte de la fecha con slice
+                        let fechaFormateada = fechaAPI.slice(0, 10);
+                        td.textContent = fechaFormateada;
+                    }
+                }else{
+                    td.textContent = fila[columna];  // Utilizar directamente la columna como clave
+                }
                 tr.appendChild(td);
             });
             tbody.appendChild(tr);
@@ -803,3 +860,11 @@ function validarFormularioInput(name) {
     // Si todos los campos están llenos, permitir el envío del formulario
     return true;
 }
+
+const btn_logout = document.querySelector('.nav-link-logout');
+
+btn_logout.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = '../../index.html';
+    localStorage.setItem('nivel_acceso', sinlog);
+})

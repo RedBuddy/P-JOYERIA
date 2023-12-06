@@ -6,6 +6,9 @@ let accionTabla;
 let productosVentasAcumuladas = [];
 let objetoForm;
 let cantidadMinimaPagar;
+
+let limiteCredito = [];
+let elementoEncontrado;
 //Verificacion de permiso para el subsistema
 import { verificar_permiso_subsistema, verificar_permiso_modulo, contenido_denegado } from "./loggin.js";
 let nombreHtml = window.location.pathname.split("/").pop();
@@ -20,6 +23,7 @@ opcionesVenta.forEach((opcion) => {
   opcion.addEventListener('click', e => {
     e.preventDefault();
     limpiarHMTL();
+    cambiarColor(e);
     let opcionSeleccionada = e.target.classList;
     if (opcionSeleccionada.contains('registrar_venta')) {
       opcionVentaSeleccionada = 'registrar_venta';
@@ -33,6 +37,10 @@ opcionesVenta.forEach((opcion) => {
       opcionVentaSeleccionada = 'registrar_abono';
       tipoTabla = 'venta';
       accionTabla = 'agregar';
+    }else if (opcionSeleccionada.contains('detalle_venta')) {
+      opcionVentaSeleccionada = 'detalle_venta';
+      tipoTabla = 'detalle_venta';
+      accionTabla = 'consultar';
     }
     pintarHtml();
   });
@@ -53,6 +61,9 @@ function pintarHtml() {
   } else if (opcionVentaSeleccionada === 'registrar_abono') {
     campos = ["Id"];
     API(divDatos, campos, thTabla);
+  }else if(opcionVentaSeleccionada === 'detalle_venta'){
+    thTabla = ["ID_VENTA","ID_PRODUCTO","CANTIDAD"];
+    API(divDatos, campos,  thTabla);
   }
 }
 
@@ -119,13 +130,25 @@ async function API(divDatos, campos, thTabla) {
         let tabla = construirTabla(divDatosVenta, productosVentasAcumuladas, ["ID", "NOMBRE", "PRECIO", "CANTIDAD", " + ", " - "], productosAVender);
         divPanel.append(tabla);
         colocarTotal();
-      }else{
-        swal ( "Oops" ,  "Por favor, llena el campo correctamente" ,  "error" );
+      } else {
+        swal("Oops", "Por favor, llena el campo correctamente", "error");
       }
     })
 
 
-  } else if (accionTabla === 'consultar') {
+  } else if(accionTabla === 'consultar' && opcionVentaSeleccionada === 'detalle_venta'){
+        let datos = await obtenerDatos(tipoTabla);
+        divPanel.append(divDatos);
+        divPanel.append(construirTablas(datos, thTabla));
+        $('.tabla').DataTable({
+            lengthChange: false,
+            info: false,
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json"
+            }, "pageLength": 7
+        });
+  }
+  else if (accionTabla === 'consultar') {
     let div = document.createElement('div');
     div.classList.add('form-datos');
     div.innerHTML = crearFormularioNav(campos);
@@ -136,33 +159,33 @@ async function API(divDatos, campos, thTabla) {
     btnRegistrar.addEventListener('click', async (e) => {
       e.preventDefault();
       let formularioCorrecto = validarFormularioInput('nav');
-      if(formularioCorrecto){
+      if (formularioCorrecto) {
         let valor = document.querySelector('.form-datos form select').value;
-      if (valor === 'Contado') {
-        thTabla = ["ID", "FECHA_DE_VENTA", "MONTO_TOTAL"];
-      } else {
-        thTabla = ["ID",  "MONTO_TOTAL", "MONTO_PAGADO", "ESTATUS", "FECHA_PROXIMO_PAGO", "MENSUALIDADES_PAGADAS"]
-      }
-      //REMOVER EL ELEMENTO
-      let quitarTabla = document.querySelector('.panel .tablas .no-footer');
-      if (quitarTabla) {
-        quitarTabla.remove();
-      }
+        if (valor === 'Contado') {
+          thTabla = ["ID", "FECHA_DE_VENTA", "MONTO_TOTAL"];
+        } else {
+          thTabla = ["ID", "MONTO_TOTAL", "MONTO_PAGADO", "ESTATUS","FECHA_DE_VENTA", "FECHA_PROXIMO_PAGO"]
+        }
+        //REMOVER EL ELEMENTO
+        let quitarTabla = document.querySelector('.panel .tablas .no-footer');
+        if (quitarTabla) {
+          quitarTabla.remove();
+        }
 
-      divPanel.append(divDatos);
-      divPanel.append(await construirTabla(divDatos, datos, thTabla, null, valor));
-      $('.tabla').DataTable({
-        lengthChange: false,
-        info: false,
-        "language": {
-          "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json"
-        }, "pageLength": 7
-        
-        
-        
-      });
-      }else{
-        swal("Algo salio mal","Elige el tipo de venta correctamente","error");
+        divPanel.append(divDatos);
+        divPanel.append(await construirTabla(divDatos, datos, thTabla, null, valor));
+        $('.tabla').DataTable({
+          lengthChange: false,
+          info: false,
+          "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json"
+          }, "pageLength": 7
+
+
+
+        });
+      } else {
+        swal("Algo salio mal", "Elige el tipo de venta correctamente", "error");
       }
     })
 
@@ -178,18 +201,18 @@ async function API(divDatos, campos, thTabla) {
     btnBuscar.addEventListener('click', async (e) => {
       e.preventDefault();
       let formularioCorrecto = validarFormularioInput('nav');
-      if(formularioCorrecto){
-      limpiarHMTL();
-      let datosVenta = await obtenerDatos('venta', input.value);
-      campos = ["Monto_total", "Monto_pagado", "Fecha_proximo_pago", "Monto_mensualidad"];
+      if (formularioCorrecto) {
+        limpiarHMTL();
+        let datosVenta = await obtenerDatos('venta', input.value);
+        campos = ["Monto_total", "Monto_pagado", "Fecha_proximo_pago", "Monto_mensualidad"];
 
-      let divDatos = document.createElement('div');
-      divDatos.classList.add('tablas');
-      divPanel.append(divDatos);
-      console.log('hola');
-      construirFormVenta(campos, datosVenta, input.value);
-      }else{
-        swal('Algo salio mal', 'Llena el campo correspondiente',"error");
+        let divDatos = document.createElement('div');
+        divDatos.classList.add('tablas');
+        divPanel.append(divDatos);
+        console.log('hola');
+        construirFormVenta(campos, datosVenta, input.value);
+      } else {
+        swal('Algo salio mal', 'Llena el campo correspondiente', "error");
       }
     })
   }
@@ -236,17 +259,19 @@ function construirFormVenta(campos, datosVenta, id) {
           console.log('hola');
           objetoForm["Fecha_abono"] = formatoFecha;
           let formularioCorrecto = validarFormularioInput('formulario-venta');
-          if(formularioCorrecto){
+          if (formularioCorrecto) {
             console.log(montoAbonado, cantidadMinimaPagar);
-            if(parseInt(montoAbonado) < parseInt(cantidadMinimaPagar)){
-              swal('Algo salio mal', 'La cantidad de monto abonado es incorrecta','error');
+            if (parseInt(montoAbonado) < parseInt(cantidadMinimaPagar)) {
+              swal('Algo salio mal', 'La cantidad de monto abonado es incorrecta', 'error');
+            } else if (montoAbonado >= cantidadMinimaPagar && montoAbonado % cantidadMinimaPagar === 0) {
+              swal('Abono registrado correctamente', 'El abono ha sido registrado', 'success');
+              ponerDatos();
             }else{
-              swal('Abono registrado correctamente','El abono ha sido registrado','success');              
-            ponerDatos();
+            swal('Algo salio mal', 'Verifica que la cantidad abonada tenga relacion con las mensualidades', 'error');
             }
-          }else {
-              swal('Algo salio mal', 'Llena correctamente la cantidad de monto abonado','error');
-            
+          } else {
+            swal('Algo salio mal', 'Llena correctamente la cantidad de monto abonado', 'error');
+
           }
         }
 
@@ -257,12 +282,73 @@ function construirFormVenta(campos, datosVenta, id) {
     });
 }
 
+function construirTablas(datos, thTabla) {
+  let quitarTabla = document.querySelector('.panel .tablas .tabla');
+  if (quitarTabla) {
+      quitarTabla.remove();
+  }else{
+      console.log('hola');
+  }
+  const div = document.createElement('div');
+  div.classList.add('tablas');
+  const tabla = document.createElement('table');
+  tabla.classList.add('tabla');
+  // Encabezado de la tabla
+  const thead = document.createElement('thead');
+  const trHead = document.createElement('tr');
+  thTabla.forEach((thText) => {
+      const th = document.createElement('th');
+      let titulo = formatText(thText);
+      th.textContent = titulo;
+      trHead.appendChild(th);
+  });
+  thead.appendChild(trHead);
+  tabla.appendChild(thead);
+
+  // Cuerpo de la tabla
+  const tbody = document.createElement('tbody');
+
+  if (datos && datos.length > 0) {
+      datos.forEach((fila) => {
+          const tr = document.createElement('tr');
+          thTabla.forEach((columna) => {
+              const td = document.createElement('td');
+              if (columna === 'FECHA') {
+                  if (fila[columna]) {
+                      let fechaAPI = fila[columna];
+                      // Obtener solo la parte de la fecha con slice
+                      let fechaFormateada = fechaAPI.slice(0, 10);
+                      td.textContent = fechaFormateada;
+                  }
+              }else{
+                  td.textContent = fila[columna];  // Utilizar directamente la columna como clave
+              }
+              tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+      });
+  } else {
+      // Crear una fila de "sin datos" si no hay datos
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.textContent = 'Sin datos disponibles';
+      td.colSpan = thTabla.length;
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+  }
+
+  tabla.appendChild(tbody);
+  div.append(tabla);
+  // Limpiar y añadir la tabla al contenedor
+  return div;
+}
+
+
 function construirTabla(div, datos, thTabla, productosAVender, tipoVenta) {
   let quitarTabla = document.querySelector('.panel .tablas .tabla');
   if (quitarTabla) {
     quitarTabla.remove();
   }
-  console.log(tipoVenta);
   if (tipoVenta === 'Contado') {
     datos = datos.filter(function (objeto) {
       return objeto.TIPO_VENTA === "Contado";
@@ -431,6 +517,9 @@ function obtenerDatos(tipoTabla, id) {
 
               arregloDatos.push(item);
             }
+            if (tipoTabla === 'clientes') {
+              limiteCredito = data;
+            }
           });
           resolve(arregloDatos);
         }
@@ -540,11 +629,11 @@ async function crearFormularioLlenado(campos, datos) {
 
   console.log(datos)
   for (const campo of campos) {
-   let textoLabel = formatText(campo);
+    let textoLabel = formatText(campo);
 
-   if(campo === 'Id_cliente'){
-    textoLabel = 'Cliente';
-   }
+    if (campo === 'Id_cliente') {
+      textoLabel = 'Cliente';
+    }
 
     formulario += `<label for="${campo}">${textoLabel}</label>`;
 
@@ -622,10 +711,10 @@ async function validarFormulario(form) {
     agregarModal();
   } else {
     let formularioCorrecto = validarFormularioInput('formulario-venta');
-    if(formularioCorrecto){
+    if (formularioCorrecto) {
       ponerDatos();
       swal("Venta registrada", ``, "success");
-    }else{
+    } else {
       swal('Oops', 'Llena los datos de la venta correctamente', 'error');
     }
   }
@@ -638,7 +727,7 @@ function agregarModal() {
   modal.innerHTML = `
   <div class="modal-content-ya">
     <form class="formulario-registro" name="formulario-venta-credito">
-      <label for="plazoOptions">Plazo de Crédito: (SIN INTERESES)</label>
+      <label for="plazoOptions">Plazo de Crédito:</label>
       <select id="Numero_mensualidades" name="Numero_mensualidades">
         <option value="">Selecciona uno</option>
         <option value="3">3 meses</option>
@@ -654,7 +743,7 @@ function agregarModal() {
 
       
       <label for="mensualidad">Mensualidad:</label>
-      <input id="Monto_mensualidad" name="Monto_mensualidad" type="text" autocomplete="off"> 
+      <input id="Monto_mensualidad" name="Monto_mensualidad" type="text" autocomplete="off" disabled> 
       <button type="button" id="cerrar">Cerrar</button>
       <button type="button" id="registrarVenta"> Registrar </button>
     </form>
@@ -679,12 +768,17 @@ function agregarModal() {
   const btnRegistrar = document.getElementById('registrarVenta');
   console.log(btnRegistrar)
   btnRegistrar.addEventListener('click', () => {
+    elementoEncontrado = limiteCredito.filter(item => item.ID === parseInt(objetoForm["Id_cliente"]));
+
     let formularioCorrecto = validarFormularioInput('formulario-venta-credito');
-    if(formularioCorrecto){
-      console.log(objetoForm);
-      ponerDatos();
-      swal("Venta registrada", ``, "success");
-    }else{
+    if (formularioCorrecto) {
+      if (parseInt(objetoForm["Monto_total"]) <= elementoEncontrado[0].CREDITO_MAXIMO) {
+        ponerDatos();
+        swal("Venta registrada correctamente", ``, "success");
+      } else {
+        swal("El credito que tiene el cliente es menor al solicitado", '', 'error');
+      }
+    } else {
       swal('Oops', 'Llena correctamente todos los campos', 'error');
     }
   })
@@ -793,15 +887,40 @@ function validarFormularioInput(name) {
   var elementosFormulario = document.forms[name].elements;
   // Iterar sobre los elementos y verificar si están llenos
   for (var i = 0; i < elementosFormulario.length; i++) {
-      // Verificar solo los elementos que son input, select o textarea
-      if (elementosFormulario[i].type !== 'submit' && elementosFormulario[i].type !== 'reset' && elementosFormulario[i].type !== 'button') {
-          if (elementosFormulario[i].value === '') {
-              console.log(elementosFormulario[i])
-              return false; // Evitar que el formulario se envíe
-          }
+    // Verificar solo los elementos que son input, select o textarea
+    if (elementosFormulario[i].type !== 'submit' && elementosFormulario[i].type !== 'reset' && elementosFormulario[i].type !== 'button') {
+      if (elementosFormulario[i].value === '') {
+        console.log(elementosFormulario[i])
+        return false; // Evitar que el formulario se envíe
       }
+    }
   }
 
   // Si todos los campos están llenos, permitir el envío del formulario
   return true;
+}
+
+const btn_logout = document.querySelector('.nav-link-logout');
+
+btn_logout.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = '../../index.html';
+    localStorage.setItem('nivel_acceso', sinlog);
+})
+
+function cambiarColor(event) {
+  // Obtén el elemento clicado
+  var elementoClicado = event.currentTarget;
+
+  // Remueve la clase 'active' de todos los enlaces
+  var enlaces = document.querySelectorAll('.nav-sup-link');
+  enlaces.forEach(function (enlace) {
+      enlace.classList.remove('active');
+  });
+
+  // Agrega la clase 'active' al enlace clicado
+  elementoClicado.classList.add('active');
+  
+  // Puedes descomentar la siguiente línea si también quieres evitar la acción predeterminada del enlace
+  // event.preventDefault();
 }

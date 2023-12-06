@@ -22,6 +22,7 @@ if (!verificar_permiso_subsistema(nivel_acceso, nombreHtml.split('.')[0])) {
 opcionesCompra.forEach((opcion) => {
     opcion.addEventListener('click', e => {
         e.preventDefault();
+        cambiarColor(e);
         limpiarHMTL();
         let opcionSeleccionada = e.target.classList;
         if (opcionSeleccionada.contains('registrar_compra')) {
@@ -36,13 +37,18 @@ opcionesCompra.forEach((opcion) => {
             opcionCompraSeleccionada = 'registrar_abono';
             tipoTabla = 'compra';
             accionTabla = 'agregar';
-        }
+        }else if (opcionSeleccionada.contains('detalle_compra')) {
+            opcionVentaSeleccionada = 'detalle_compra';
+            tipoTabla = 'detalle_compra';
+            accionTabla = 'consultar';
+          }
         pintarHtml();
     });
 });
 
 function pintarHtml() {
     limpiarHMTL();
+    objetoForm = {};
     let campos, thTabla;
     let divDatos = document.createElement('div');
     if (opcionCompraSeleccionada === 'registrar_compra') {
@@ -56,7 +62,10 @@ function pintarHtml() {
     } else if (opcionCompraSeleccionada === 'registrar_abono') {
         campos = ["Id"];
         API(divDatos, campos, thTabla);
-    }
+    }else if(opcionVentaSeleccionada === 'detalle_compra'){
+        thTabla = ["ID_COMPRA","ID_MATERIA_PRIMA","CANTIDAD"];
+        API(divDatos, campos,  thTabla);
+      }
 }
 
 async function API(divDatos, campos, thTabla) {
@@ -82,17 +91,13 @@ async function API(divDatos, campos, thTabla) {
                 console.log(await crearFormularioNav(campos));
                 div.innerHTML = await crearFormularioNav(campos);
                 if (opcionCompraSeleccionada === 'registrar_compra') {
-                    div.innerHTML += `<ul id="productList"></ul> `;
+                    div.innerHTML += `<ul id="product"></ul> `;
                 }
                 let prod = await obtenerDatos('materia_prima');
 
                 
-                limiteCredito.filter(cosa => {
-                    console.log(cosa.ID);
-                })
-                console.log(valor);
                 elementoEncontrado = limiteCredito.filter(item => item.ID === parseInt(valor));
-                console.log(elementoEncontrado);
+                
                 let productos = prod.filter(item => item.ID_PROVEEDOR === parseInt(valor));
 
                 
@@ -136,7 +141,18 @@ async function API(divDatos, campos, thTabla) {
 
 
 
-    } else if (accionTabla === 'consultar') {
+    } else if(accionTabla === 'consultar' && opcionVentaSeleccionada === 'detalle_compra'){
+        let datos = await obtenerDatos(tipoTabla);
+        divPanel.append(divDatos);
+        divPanel.append(construirTablas(datos, thTabla));
+        $('.tabla').DataTable({
+            lengthChange: false,
+            info: false,
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json"
+            }, "pageLength": 7
+        });
+  }else if (accionTabla === 'consultar') {
         let div = document.createElement('div');
         div.classList.add('form-datos');
         div.innerHTML = await crearFormularioNav(campos);
@@ -152,7 +168,7 @@ async function API(divDatos, campos, thTabla) {
                 if (valor === 'Contado') {
                     thTabla = ["ID", "FECHA", "MONTO_TOTAL"];
                 } else {
-                    thTabla = ["ID", "MONTO_TOTAL", "MONTO_PAGADO", "ESTATUS", "FECHA_PROXIMO_PAGO", "MENSUALIDADES_PAGADAS"]
+                    thTabla = ["ID", "MONTO_TOTAL", "MONTO_PAGADO", "ESTATUS","FECHA" , "FECHA_PROXIMO_PAGO"]
                 }
                 //REMOVER EL ELEMENTO
                 let quitarTabla = document.querySelector('.panel .tablas .no-footer');
@@ -394,11 +410,11 @@ function aumentarEliminar(e, productosAVender) {
 }
 
 async function crearFormularioNav(campos) {
-    let formulario = '<form action="" class="form" name="nav">';
+    let formulario = '<form action="" class="form" name="nav" autocomplete="off">';
 
     for (const campo of campos) {
         let titulo = formatText(campo);
-        let input = `<input type="text" name="${campo}" id="${campo}" class=""></input>`;
+        let input = `<input type="number" name="${campo}" id="${campo}" class=""></input>`;
 
         if (campo === 'Tipo_compra') {
             const opciones = [['Contado', 'Contado'], ['Credito', 'Credito']];
@@ -545,7 +561,7 @@ async function autocompletarProductos(datos) {
 }
 
 function mostrarProductos(productos) {
-    let lista = document.getElementById("productList");
+    let lista = document.getElementById("product");
     lista.innerHTML = ""; // Limpiar la lista antes de agregar nuevos elementos
 
     productos.forEach(function (producto) {
@@ -567,12 +583,12 @@ function seleccionarProducto(event) {
     // Haz lo que necesites con el ID del producto seleccionado
     let input = document.querySelector('.panel form input[type="text"]');
     input.value = selectedProductId;
-    document.getElementById("productList").style.display = "none";
+    document.getElementById("product").style.display = "none";
 }
 
 // Oculta la lista si se hace clic fuera del input y la lista
 document.addEventListener("click", function (event) {
-    let productListRegistrarVenta = document.getElementById("productList");
+    let productListRegistrarVenta = document.getElementById("product");
     if (productListRegistrarVenta && event.target !== productListRegistrarVenta && event.target !== document.getElementById("Id_materia_prima")) {
         productListRegistrarVenta.style.display = "none";
     }
@@ -591,7 +607,7 @@ function limpiarHMTL() {
 
 //CREAR FORMULARIO
 async function crearFormularioLlenado(campos, datos) {
-    let formulario = `<form id="formulario-registro" name="formulario-compra">`;
+    let formulario = `<form id="formulario-registro" name="formulario-compra" autocomplete="off">`;
 
     console.log(datos)
     for (const campo of campos) {
@@ -689,8 +705,8 @@ function agregarModal() {
     modal.classList.add('modal', 'formulario');
     modal.innerHTML = `
   <div class="modal-content-ya">
-    <form class="formulario-registro" name="formulario-compra-credito">
-      <label for="plazoOptions">Plazo de Crédito: (SIN INTERESES)</label>
+    <form class="formulario-registro" name="formulario-compra-credito" autocomplete="off">
+      <label for="plazoOptions">Plazo de Crédito:</label>
       <select id="Numero_mensualidades" name="Numero_mensualidades">
         <option value="">Selecciona uno</option>
         <option value="3">3 meses</option>
@@ -829,4 +845,29 @@ function validarFormularioInput(name) {
 
     // Si todos los campos están llenos, permitir el envío del formulario
     return true;
+}
+
+const btn_logout = document.querySelector('.nav-link-logout');
+
+btn_logout.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = '../../index.html';
+    localStorage.setItem('nivel_acceso', sinlog);
+})
+
+function cambiarColor(event) {
+    // Obtén el elemento clicado
+    var elementoClicado = event.currentTarget;
+
+    // Remueve la clase 'active' de todos los enlaces
+    var enlaces = document.querySelectorAll('.nav-sup-link');
+    enlaces.forEach(function (enlace) {
+        enlace.classList.remove('active');
+    });
+
+    // Agrega la clase 'active' al enlace clicado
+    elementoClicado.classList.add('active');
+    
+    // Puedes descomentar la siguiente línea si también quieres evitar la acción predeterminada del enlace
+    // event.preventDefault();
 }

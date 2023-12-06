@@ -17,6 +17,7 @@ if (!verificar_permiso_subsistema(nivel_acceso, nombreHtml.split('.')[0])) {
 opcionesEmpleados.forEach((opcion) => {
     opcion.addEventListener('click', e => {
         e.preventDefault();
+        cambiarColor(e);
         limpiarHtml(panelEmpleados)
         let opcionSeleccionada = e.target.classList;
         if (opcionSeleccionada.contains('agregar_empleado')) {
@@ -49,12 +50,12 @@ function pintarHtml() {
 }
 
 function crearFormularioNav(campos) {
-    let formulario = '<form action="" class="form" name="nav">';
+    let formulario = '<form action="" class="form" name="nav" autocomplete="off">';
     campos.forEach(campo => {
         let titulo = formatText(campo);
         formulario += `
         <label for="${campo}">${titulo}</label>
-        <input type="text" name="${campo}" id="${campo}" class=""></input>
+        <input type="number" name="${campo}" id="${campo}" class=""></input>
         <input type="submit" name="${campo}" id="${campo}" value="Buscar" class="producto">`;
     });
 
@@ -72,7 +73,7 @@ async function API(divDatos, campos, thTabla) {
         let btnRegistrar = document.querySelector('.form input[type="submit"]');
         btnRegistrar.addEventListener('click', (e) => {
             e.preventDefault();
-            const id = document.querySelector('.form input[type="text"]');
+            const id = document.querySelector('.form input[type="number"]');
             limpiarHtml();
             eliminarDatosId(tipoTabla, id.value);
         })
@@ -101,7 +102,7 @@ async function API(divDatos, campos, thTabla) {
             let formularioCorrecto = validarFormularioInput('nav');
             if (formularioCorrecto) {
                 console.log('hola');
-                const id = document.querySelector('.form input[type="text"]');
+                const id = document.querySelector('.form input[type="number"]');
                 limpiarHtml();
                 edicionDatos(e, campos, id.value);
             } else {
@@ -166,6 +167,7 @@ function obtenerDatos(tipoTabla) {
 async function tomarDatos(e) {
     e.preventDefault();
     const form = document.querySelector("#formulario-registro");
+
     let formularioCorrecto = validarFormularioInput('formulario-registro');
     if (formularioCorrecto) {
         swal('Empleado añadido correctamente', '', 'success');
@@ -174,7 +176,7 @@ async function tomarDatos(e) {
 }
 
 async function crearFormulario(campos) {
-    let formulario = `<form id="formulario-registro" name="formulario-registro">`;
+    let formulario = `<form id="formulario-registro" name="formulario-registro" autocomplete="off">`;
 
     for (let campo of campos) {
         const textoLabel = formatText(campo);
@@ -182,17 +184,19 @@ async function crearFormulario(campos) {
 
         formulario += `<label for="${campo}">${textoLabel}</label>`;
 
-        if (campo === 'Fecha_ingreso' || campo === 'Fecha_nacimiento') {
-            formulario += `<input type="date" name="${campo}" id="${campo}">`;
+        if (campo === 'Activo') {
+            formulario += `<input type="text" name="${campo}" id="${campo}" value="S" disabled>`;
+        } else if (campo === 'Fecha_ingreso' || campo === 'Fecha_nacimiento') {
+            formulario += `<input type="date" name="${campo}" id="${campo}" autocomplete="off">`;
         } else if (campo === 'Puesto') {
             const opciones = [["Gerente", "Gerente"], ["Vendedor", "Vendedor"], ["Almacenista", "Almacenista"], ["Asistente de ventas", "Asistente de ventas"], ["Comprador", "Comprador"]];
             formulario += generateSelectField(campo, opciones, tipoTabla);
         } else if (campo === 'Turno') {
             formulario += generateSelectField(campo, [["Matutino", "Matutino"], ["Vespertino", "Vespertino"]]);
         } else if (campo === 'Salario_hora') {
-            formulario += `<input type="number" name="${campo}" id="${campo}">`;
+            formulario += `<input type="number" name="${campo}" id="${campo}" autocomplete="off">`;
         } else {
-            formulario += `<input type="text" name="${campo}" id="${campo}">`;
+            formulario += `<input type="text" name="${campo}" id="${campo}" autocomplete="off">`;
         }
     }
 
@@ -200,12 +204,19 @@ async function crearFormulario(campos) {
     return formulario;
 }
 
-function ponerDatos(form) {
+function ponerDatos(form, id) {
     const form_data = new FormData(form);
+    if (opcionEmpleadosSeleccionada === 'agregar_empleado') {
+        const valorCampoDeshabilitado = document.getElementById('Activo').value; // Reemplaza 'idCampoDeshabilitado' con el ID de tu campo deshabilitado
+        tipoTabla = 'crearUsuarioDesdeEmpleado';
+        form_data.append('Activo', valorCampoDeshabilitado);
+    }else if(opcionEmpleadosSeleccionada === 'editar_empleado'){
+        tipoTabla = `editarUsuarioDesdeEmpleado/${id}`;
+    }
+
     const data = new URLSearchParams(form_data);
 
-
-    form_data.forEach((clave, valor) => {
+    data.forEach((clave, valor) => {
         console.log(clave, valor);
     })
 
@@ -217,10 +228,10 @@ function ponerDatos(form) {
             if (!res.ok) {
                 throw new Error(`Error en la solicitud: ${res.status} - ${res.statusText}`);
             }
+            console.log(res);
             return res.json();
         })
         .then(data => {
-            console.log(data);
             return data;
         })
         .catch(error => {
@@ -332,10 +343,10 @@ async function llenarFormulario(campos, id) {
 
                     const form = document.querySelector("#formulario-registro");
                     let formularioCorrecto = validarFormularioInput('formulario-registro');
-                    console.log(formularioCorrecto)
+
                     if (formularioCorrecto) {
                         swal('Empleado editado correctamente', '', 'success');
-                        await actualizarDatos(form, tipoTabla, id);
+                        ponerDatos(form, id);
                     }
                 } catch (error) {
                     console.error('Error al actualizar datos:', error);
@@ -352,7 +363,7 @@ async function llenarFormulario(campos, id) {
 
 
 async function crearFormularioLlenado(campos, datos) {
-    let formulario = `<form id="formulario-registro" name="formulario-registro">`;
+    let formulario = `<form id="formulario-registro" name="formulario-registro" autocomplete="off">`;
 
 
     for (const campo of campos) {
@@ -362,14 +373,23 @@ async function crearFormularioLlenado(campos, datos) {
 
         let posicion = campo.toUpperCase();
 
-
-        if (campo === 'Fecha_ingreso' || campo === 'Fecha_nacimiento') {
+        if (campo === 'Activo') {
+            formulario += `<input type="text" name="${campo}" id="${campo}" autocomplete="off" value="${datos[posicion] || ''}">`;
+        }
+        else if (campo === 'Puesto') {
+            const opciones = [["Gerente", "Gerente"], ["Vendedor", "Vendedor"], ["Almacenista", "Almacenista"], ["Asistente de ventas", "Asistente de ventas"], ["Comprador", "Comprador"]];
+            formulario += generateSelectField(campo, opciones, datos[posicion]);
+        } else if (campo === 'Turno') {
+            const opciones = [["Matutino", "Matutino"], ["Vespertino", "Vespertino"]];
+            formulario += generateSelectField(campo, opciones, datos[posicion]);
+        }
+        else if (campo === 'Fecha_ingreso' || campo === 'Fecha_nacimiento') {
             let fechaAPI = datos[posicion];
             // Obtener solo la parte de la fecha con slice
             let fechaFormateada = fechaAPI.slice(0, 10);
-            formulario += `<input type="date" name="${campo}" id="${campo}" value="${fechaFormateada || ''}">`;
+            formulario += `<input type="date" name="${campo}" autocomplete="off" id="${campo}" value="${fechaFormateada || ''}">`;
         } else {
-            formulario += `<input type="text" name="${campo}" id="${campo}" value="${datos[posicion] || ''}">`;
+            formulario += `<input type="text" name="${campo}" autocomplete="off" id="${campo}" value="${datos[posicion] || ''}">`;
         }
     }
 
@@ -395,7 +415,7 @@ function obtenerDatosId(tipoTabla, id) {
                 resolve(data);
             })
             .catch(error => {
-                // Rechazar la promesa en caso de error
+                swal("El empleado no fue encontrado", "", "error");
                 reject(error);
             });
     });
@@ -531,4 +551,29 @@ function validarCorreoElectronico(correo) {
     // Expresión regular básica para validar el formato de un correo electrónico
     const regexCorreoElectronico = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
     return regexCorreoElectronico.test(correo);
+}
+
+const btn_logout = document.querySelector('.nav-link-logout');
+
+btn_logout.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = '../../index.html';
+    localStorage.setItem('nivel_acceso', sinlog);
+})
+
+function cambiarColor(event) {
+    // Obtén el elemento clicado
+    var elementoClicado = event.currentTarget;
+
+    // Remueve la clase 'active' de todos los enlaces
+    var enlaces = document.querySelectorAll('.nav-sup-link');
+    enlaces.forEach(function (enlace) {
+        enlace.classList.remove('active');
+    });
+
+    // Agrega la clase 'active' al enlace clicado
+    elementoClicado.classList.add('active');
+
+    // Puedes descomentar la siguiente línea si también quieres evitar la acción predeterminada del enlace
+    // event.preventDefault();
 }

@@ -18,6 +18,7 @@ if (!verificar_permiso_subsistema(nivel_acceso, nombreHtml.split('.')[0])) {
 opcionesProveedores.forEach((opcion) => {
     opcion.addEventListener('click', e => {
         e.preventDefault();
+        cambiarColor(e);
         limpiarHtml(panelProveedores)
         let opcionSeleccionada = e.target.classList;
         if (opcionSeleccionada.contains('registrar_proveedor')) {
@@ -43,9 +44,9 @@ function pintarHtml() {
     let divDatos = document.createElement('div');
 
     if (opcionProveedoresSeleccionada === 'registrar_proveedor' || opcionProveedoresSeleccionada === 'editar_proveedor') {
-        campos = ["Nombre", "Representante", "RFC", "Correo_electronico", "Celular", "Numero_exterior", "Codigo_postal", "Ciudad", "Estado", "Limite_de_credito", "Dias_de_credito", "Domicilio"];
+        campos = ["Nombre", "Representante", "RFC", "Correo_electronico", "Celular", "Numero_exterior", "Codigo_postal", "Ciudad", "Estado", "Limite_de_credito", "Domicilio"];
     } else if (opcionProveedoresSeleccionada === 'consultar_proveedor') {
-        thTabla = ["ID", "NOMBRE", "REPRESENTANTE", "CORREO_ELECTRONICO", "CELULAR", "LIMITE_DE_CREDITO", "DIAS_DE_CREDITO"];
+        thTabla = ["ID", "NOMBRE", "REPRESENTANTE", "CORREO_ELECTRONICO", "CELULAR", "LIMITE_DE_CREDITO"];
     }
 
     API(divDatos, campos, thTabla);
@@ -53,12 +54,12 @@ function pintarHtml() {
 }
 
 function crearFormularioNav(campos) {
-    let formulario = '<form action="" class="form">';
+    let formulario = '<form action="" class="form" name="nav" autocomplete="off">';
     campos.forEach(campo => {
         let titulo = formatText(campo);
         formulario += `
         <label for="${campo}">${titulo}</label>
-        <input type="text" name="${campo}" id="${campo}" class=""></input>
+        <input type="number" name="${campo}" id="${campo}" class=""></input>
         <input type="submit" name="${campo}" id="${campo}" value="Buscar" class="producto">`;
     });
 
@@ -76,9 +77,15 @@ async function API(divDatos, campos, thTabla) {
         let btnRegistrar = document.querySelector('.form input[type="submit"]');
         btnRegistrar.addEventListener('click', (e) => {
             e.preventDefault();
-            const id = document.querySelector('.form input[type="text"]');
-            limpiarHtml();
-            eliminarDatosId(tipoTabla, id.value);
+            let formularioCorrecto = validarFormularioInput('nav');
+            if (formularioCorrecto) {
+                const id = document.querySelector('.form input[type="number"]');
+                limpiarHtml();
+                eliminarDatosId(tipoTabla, id.value);
+                
+            } else {
+                swal('Llena el campo correspondiente', '', 'error');
+            }
         })
     } else if (accionTabla === "consultar") {
         console.log('hola');
@@ -102,9 +109,14 @@ async function API(divDatos, campos, thTabla) {
         divPanel.append(div);
         let btnRegistrar = document.querySelector('.form input[type="submit"]');
         btnRegistrar.addEventListener('click', (e) => {
-            const id = document.querySelector('.form input[type="text"]');
-            limpiarHtml();
-            edicionDatos(e, campos, id.value);
+            let formularioCorrecto = validarFormularioInput('nav');
+            if (formularioCorrecto) {
+                const id = document.querySelector('.form input[type="number"]');
+                limpiarHtml();
+                edicionDatos(e, campos, id.value);
+            } else {
+                swal('Llena el campo correspondiente', '', 'error');
+            }
         })
     } else {
         crearFormulario(campos)
@@ -164,11 +176,15 @@ function obtenerDatos(tipoTabla) {
 async function tomarDatos(e) {
     e.preventDefault();
     const form = document.querySelector("#formulario-registro");
-    let hola = ponerDatos(form, tipoTabla);
+    let formularioCorrecto = validarFormularioInput('formulario-registro');
+    if (formularioCorrecto) {
+        swal('Proveedor añadido correctamente', '', 'success');
+        ponerDatos(form);
+    }
 }
 
 async function crearFormulario(campos) {
-    let formulario = `<form id="formulario-registro">`;
+    let formulario = `<form id="formulario-registro" name="formulario-registro" autocomplete="off">`;
 
     for (let campo of campos) {
         const textoLabel = formatText(campo);
@@ -178,6 +194,8 @@ async function crearFormulario(campos) {
 
         if (campo === 'fecha') {
             formulario += `<input type="date" name="${campo}" id="${campo}">`;
+        } else if (campo === 'Limite_de_credito') {
+            formulario += `<input type="number" name="${campo}" id="${campo}">`;
         } else if (campo === 'Tipo') {
             formulario += generateSelectField(campo, [["_mp", "Materia prima"], ["_pt", "Producto terminado"]]);
         } else {
@@ -189,7 +207,7 @@ async function crearFormulario(campos) {
     return formulario;
 }
 
-function ponerDatos(form, tipoTabla) {
+function ponerDatos(form) {
     const form_data = new FormData(form);
     const data = new URLSearchParams(form_data);
 
@@ -213,6 +231,7 @@ function ponerDatos(form, tipoTabla) {
             return data;
         })
         .catch(error => {
+            swal("Error al registrar proveedor","El proveedor se encuentra ya registrado","error");
             console.error(error); // Agregar esta línea para ver el error en la consola
         });
 }
@@ -308,9 +327,14 @@ async function llenarFormulario(campos, id) {
                 try {
                     // Maneja la promesa devuelta por actualizarDatos
 
-                    let form = document.querySelector("#formulario-registro");
-                    await actualizarDatos(form, tipoTabla, id);
-                    console.log('Datos actualizados con éxito');
+
+                    const form = document.querySelector("#formulario-registro");
+                    let formularioCorrecto = validarFormularioInput('formulario-registro');
+                    console.log(formularioCorrecto)
+                    if (formularioCorrecto) {
+                        swal('Proveedor editado correctamente', '', 'success');
+                        await actualizarDatos(form, tipoTabla, id);
+                    }
                 } catch (error) {
                     console.error('Error al actualizar datos:', error);
                 }
@@ -326,7 +350,7 @@ async function llenarFormulario(campos, id) {
 
 
 async function crearFormularioLlenado(campos, datos) {
-    let formulario = `<form id="formulario-registro">`;
+    let formulario = `<form id="formulario-registro" name="formulario-registro" autocomplete="off">`;
 
 
     for (const campo of campos) {
@@ -422,12 +446,105 @@ function eliminarDatosId(tipoTabla, id) {
             })
             .then(data => {
                 // Resolver la promesa con los datos obtenidos (o mensaje)
-                console.log(data);
+                swal('El proveedor ha sido eliminado correctamente', '','success');
                 resolve(data);
             })
             .catch(error => {
-                // Rechazar la promesa en caso de error
+                swal('El proveedor no puede ser eliminado', 'Verifica el estado de el proveedor en el sistema','error');
                 reject(error);
             });
     });
+}
+
+function validarFormularioInput(name) {
+    // Obtener todos los elementos del formulario
+    var elementosFormulario = document.forms[name].elements;
+    // Iterar sobre los elementos y verificar si están llenos
+    for (var i = 0; i < elementosFormulario.length; i++) {
+        // Verificar solo los elementos que son input, select o textarea
+        if (elementosFormulario[i].type !== 'submit' && elementosFormulario[i].type !== 'reset' && elementosFormulario[i].type !== 'button') {
+            if (elementosFormulario[i].value === '') {
+                swal('Llena todos los campos correctamente', '', 'error');
+
+                return false; // Evitar que el formulario se envíe
+            }
+        }
+        if (elementosFormulario[i].id === 'RFC') {
+            if (!validarRFC(elementosFormulario[i].value)) {
+                swal('RFC incorrecto', 'El RFC es incorrecto', 'error');
+                console.log('entro pero soy gay');
+                return false;
+            }
+        }
+        if (elementosFormulario[i].id === 'Celular') {
+            if (!validarNumeroCelular(elementosFormulario[i].value)) {
+                swal('Telefono incorrecto', 'El telefono es incorrecto', 'error');
+                console.log('entro pero soy gay');
+                return false;
+            }
+        }
+        if (elementosFormulario[i].id === 'Correo_electronico') {
+            if (!validarCorreoElectronico(elementosFormulario[i].value)) {
+                swal('Correo electronico incorrecto', 'Asegurate que el correo electronico sea correcto', 'error');
+                console.log('entro pero soy gay');
+                return false;
+            }
+        }
+        if (elementosFormulario[i].id === 'Codigo_postal') {
+            if (!validarPostal(elementosFormulario[i].value)) {
+                swal('Codigo postal incorrecto', 'Asegurate que el postal sea correcto', 'error');
+                return false;
+            }
+        }
+    }
+
+    // Si todos los campos están llenos, permitir el envío del formulario
+    return true;
+}
+
+function validarRFC(rfc) {
+    const regexRFC = /^[A-Z]{4}\d{6}[A-Z\d]{3}$/;
+    return regexRFC.test(rfc);
+}
+
+function validarNumeroCelular(numero) {
+    // Asumiendo un formato común de 10 dígitos para números de teléfono en tu región
+    const regexNumeroCelular = /^[0-9]{10}$/;
+    return regexNumeroCelular.test(numero);
+}
+
+function validarCorreoElectronico(correo) {
+    // Expresión regular básica para validar el formato de un correo electrónico
+    const regexCorreoElectronico = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    return regexCorreoElectronico.test(correo);
+}
+
+function validarPostal(postal) {
+    const codigoPostalRegex = /^\d{5}(?:[-\s]\d{4})?$/;
+    return codigoPostalRegex.test(postal);
+}
+
+const btn_logout = document.querySelector('.nav-link-logout');
+
+btn_logout.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = '../../index.html';
+    localStorage.setItem('nivel_acceso', sinlog);
+})
+
+function cambiarColor(event) {
+    // Obtén el elemento clicado
+    var elementoClicado = event.currentTarget;
+
+    // Remueve la clase 'active' de todos los enlaces
+    var enlaces = document.querySelectorAll('.nav-sup-link');
+    enlaces.forEach(function (enlace) {
+        enlace.classList.remove('active');
+    });
+
+    // Agrega la clase 'active' al enlace clicado
+    elementoClicado.classList.add('active');
+    
+    // Puedes descomentar la siguiente línea si también quieres evitar la acción predeterminada del enlace
+    // event.preventDefault();
 }

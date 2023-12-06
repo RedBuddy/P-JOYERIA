@@ -25,10 +25,15 @@ opcionesGarantias.forEach((opcion) => {
             accionTabla = 'consultar';
         }else if(opcionSeleccionada.contains('registrar_devolucion_cliente')){
             opcionGarantiasSeleccionada = 'registrar_devolucion_cliente';
+            tipoTabla = 'devoluciones_clientes';
             accionTabla = 'agregar';
         }else if(opcionSeleccionada.contains('registrar_devolucion_proveedor')){
             opcionGarantiasSeleccionada = 'registrar_devolucion_proveedor';
+            tipoTabla = 'devoluciones_proveedores';
             accionTabla = 'agregar';
+        }else if(opcionSeleccionada.contains('ver_devoluciones')){
+            opcionGarantiasSeleccionada = 'ver_devoluciones';
+            accionTabla = 'consultar';
         }
         pintarHtml();
     });
@@ -45,7 +50,9 @@ function pintarHtml() {
         campos = ["Id_venta","Motivo","Estado_producto","Fecha"];
     }else if(opcionGarantiasSeleccionada === 'registrar_devolucion_proveedor'){
         campos = ["Id_compra","Motivo","Estado_producto","Fecha"];
-    }
+    }else if(opcionGarantiasSeleccionada === 'ver_devoluciones'){
+        campos = ["Tipo_devolucion"];
+    } 
 
     API(divDatos, campos, thTabla);
 
@@ -58,6 +65,9 @@ function crearFormularioNav(campos) {
         let input = `<input type="text" name="${campo}" id="${campo}" class="" autocomplete="off"></input>`
         if (campo === 'Tipo_garantia') {
             const opciones = [['Cliente', 'Cliente'], ['Proveedor', 'Proveedor']];
+            input = generateSelectField(campo, opciones);
+        }else if(campo === 'Tipo_devolucion'){
+            const opciones = [['clientes', 'Cliente'], ['proveedores', 'Proveedor']];
             input = generateSelectField(campo, opciones);
         }
         formulario += `
@@ -86,7 +96,14 @@ async function API(divDatos, campos) {
                 if (valor === 'Cliente') {
                     tipoTabla = 'ObtenerTodosLosRegistros';
                     thTabla = ["ID_VENTA", "ESTADO_GARANTIA", "FECHA_FIN_GARANTIA", "ID_CLIENTE"]
-                } else {
+                } else if(valor === 'clientes'){
+                    tipoTabla = 'devoluciones_clientes';
+                    thTabla = ["ID","ID_VENTA","MOTIVO","ESTADO_PRODUCTO","FECHA"];
+                } else if(valor === 'proveedores'){
+                    tipoTabla = 'devoluciones_proveedores';
+                    thTabla = ["ID","ID_COMPRA","MOTIVO","ESTADO_PRODUCTO","FECHA"];
+                }
+                else {
                     thTabla = ["ID_COMPRA", "ESTADO_GARANTIA", "FECHA_FIN_GARANTIA", "ID_PROVEEDOR"]
                     tipoTabla = 'ObtenerTodosLosRegistrosProveedor';
                 }
@@ -122,7 +139,13 @@ async function API(divDatos, campos) {
                 if (btnRegistrar) {
                     btnRegistrar.addEventListener('click', (e) => {
                         e.preventDefault();  // Prevenir el envío por defecto del formulario
-                        tomarDatos(e);
+                        let formularioCorrecto = validarFormularioInput('formulario-registro');
+                        if(formularioCorrecto){
+                            tomarDatos(e);
+                            swal('Devoluciones agregada correctamente', '','success');
+                        }else{
+                            swal('Llena los campos correctamente', '','error');
+                        }
                     });
                 }
                 divPanel.append(divDatos);
@@ -366,7 +389,7 @@ async function llenarFormulario(campos, id) {
 
 
 async function crearFormularioLlenado(campos, datos) {
-    let formulario = `<form id="formulario-registro">`;
+    let formulario = `<form id="formulario-registro" name="formulario-registro">`;
 
 
     for (const campo of campos) {
@@ -487,6 +510,17 @@ function generateSelectField(fieldName, options, selectedValue) {
 }
 
 
+
+function limpiarHMTL() {
+    let opciones = ['form-datos', 'almacen-mp', 'form', 'tabla', 'tablas', 'no-footer'];
+    let selector = opciones.map(opc => '.' + opc).join(', ');
+    let elementos = divPanel.querySelectorAll(selector);
+
+    elementos.forEach(elemento => {
+        elemento.remove();
+    });
+}
+
 function validarFormularioInput(name) {
     // Obtener todos los elementos del formulario
     var elementosFormulario = document.forms[name].elements;
@@ -505,12 +539,10 @@ function validarFormularioInput(name) {
     return true;
 }
 
-function limpiarHMTL() {
-    let opciones = ['form-datos', 'almacen-mp', 'form', 'tabla', 'tablas', 'no-footer'];
-    let selector = opciones.map(opc => '.' + opc).join(', ');
-    let elementos = divPanel.querySelectorAll(selector);
+const btn_logout = document.querySelector('.nav-link-logout');
 
-    elementos.forEach(elemento => {
-        elemento.remove();
-    });
-}
+btn_logout.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = '../../index.html';
+    localStorage.setItem('nivel_acceso', sinlog);
+})

@@ -18,6 +18,7 @@ if (!verificar_permiso_subsistema(nivel_acceso, nombreHtml.split('.')[0])) {
 opcionesClientes.forEach((opcion) => {
     opcion.addEventListener('click', e => {
         e.preventDefault();
+        cambiarColor(e);
         limpiarHtml(panelClientes)
         let opcionSeleccionada = e.target.classList;
         if (opcionSeleccionada.contains('agregar_cliente')) {
@@ -42,19 +43,19 @@ function pintarHtml() {
     if (opcionClientesSeleccionada === 'agregar_cliente' || opcionClientesSeleccionada === 'editar_cliente') {
         campos = ["Nombre", "RFC", "Telefono", "Correo", "Ciudad", "Direccion", "Credito_maximo"];
     } else if (opcionClientesSeleccionada === 'consultar_cliente') {
-        thTabla = ["ID", "NOMBRE", "RFC", "TELEFONO", "CORREO", "CIUDAD", "CREDITO_MAXIMO"];
+        thTabla = ["ID", "NOMBRE", "RFC", "TELEFONO", "CORREO", "CREDITO_MAXIMO"];
     }
     API(divDatos, campos, thTabla);
 
 }
 
 function crearFormularioNav(campos) {
-    let formulario = '<form action="" class="form" name="nav">';
+    let formulario = '<form action="" class="form" name="nav" autocomplete="off">';
     campos.forEach(campo => {
         let titulo = formatText(campo);
         formulario += `
         <label for="${campo}">${titulo}</label>
-        <input type="text" name="${campo}" id="${campo}" class=""></input>
+        <input type="number" name="${campo}" id="${campo}" class=""></input>
         <input type="submit" name="${campo}" id="${campo}" value="Buscar" class="producto">`;
     });
 
@@ -99,15 +100,16 @@ async function API(divDatos, campos, thTabla) {
         console.log('hla');
         let div = document.createElement('div');
         div.classList.add('form-datos');
-        let camposAux = ["Id_" + tipoTabla];
+        let camposAux = ["Id_cliente"];
         div.innerHTML = crearFormularioNav(camposAux);
         divPanel.append(div);
         let btnRegistrar = document.querySelector('.form input[type="submit"]');
         btnRegistrar.addEventListener('click', (e) => {
+            e.preventDefault();
             let formularioCorrecto = validarFormularioInput('nav');
             if (formularioCorrecto) {
                 console.log('hola');
-                const id = document.querySelector('.form input[type="text"]');
+                const id = document.querySelector('.form input[type="number"]');
                 limpiarHtml();
                 edicionDatos(e, campos, id.value);
             } else {
@@ -177,11 +179,12 @@ async function tomarDatos(e) {
     if (formularioCorrecto) {
         swal('Cliente añadido correctamente', '', 'success');
         let id = ponerDatos(form);
+        console.log(id);
     }
 }
 
 async function crearFormulario(campos) {
-    let formulario = `<form id="formulario-registro" name="formulario-registro">`;
+    let formulario = `<form id="formulario-registro" name="formulario-registro" autocomplete="off">`;
 
     for (let campo of campos) {
         const textoLabel = formatText(campo);
@@ -230,6 +233,7 @@ function ponerDatos(form) {
             return data;
         })
         .catch(error => {
+            swal("Ocurrio un error inesperado", "El cliente ya esta registrado","error");
             console.error(error); // Agregar esta línea para ver el error en la consola
         });
 }
@@ -343,7 +347,7 @@ async function llenarFormulario(campos, id) {
 
 
 async function crearFormularioLlenado(campos, datos) {
-    let formulario = `<form id="formulario-registro" name="formulario-registro">`;
+    let formulario = `<form id="formulario-registro" name="formulario-registro" autocomplete="off">`;
 
 
     for (const campo of campos) {
@@ -355,11 +359,11 @@ async function crearFormularioLlenado(campos, datos) {
 
 
         if (campo === 'fecha') {
-            formulario += `<input type="date" name="${campo}" id="${campo}" value="${datos[posicion] || ''}">`;
+            formulario += `<input type="date" name="${campo}" autocomplete="off" id="${campo}" value="${datos[posicion] || ''}">`;
         } else if (campo === 'Credito_maximo') {
-            formulario += `<input type="number" name="${campo}" id="${campo}" value="${datos[posicion] || ''}">`;
+            formulario += `<input autocomplete="off" type="number" name="${campo}" id="${campo}" value="${datos[posicion] || ''}">`;
         } else {
-            formulario += `<input type="text" name="${campo}" id="${campo}" value="${datos[posicion] || ''}">`;
+            formulario += `<input type="text" name="${campo}" id="${campo}" value="${datos[posicion] || ''}" autocomplete="off"">`;
         }
     }
 
@@ -506,4 +510,29 @@ function validarCorreoElectronico(correo) {
     // Expresión regular básica para validar el formato de un correo electrónico
     const regexCorreoElectronico = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
     return regexCorreoElectronico.test(correo);
+}
+
+const btn_logout = document.querySelector('.nav-link-logout');
+
+btn_logout.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = '../../index.html';
+    localStorage.setItem('nivel_acceso', sinlog);
+})
+
+function cambiarColor(event) {
+    // Obtén el elemento clicado
+    var elementoClicado = event.currentTarget;
+
+    // Remueve la clase 'active' de todos los enlaces
+    var enlaces = document.querySelectorAll('.nav-sup-link');
+    enlaces.forEach(function (enlace) {
+        enlace.classList.remove('active');
+    });
+
+    // Agrega la clase 'active' al enlace clicado
+    elementoClicado.classList.add('active');
+    
+    // Puedes descomentar la siguiente línea si también quieres evitar la acción predeterminada del enlace
+    // event.preventDefault();
 }

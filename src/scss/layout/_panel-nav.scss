@@ -22,7 +22,11 @@
         color: #fff;
 
         &:hover {
-            background-color: rgb(32 57 120 / 50%);
+            background-color: rgb(32, 57, 120, 0.5);
+        }
+
+        &.active {
+            background-color:  rgb(32, 57, 120, 0.5);/* Tu color cuando está clicado */;
         }
     }
 
