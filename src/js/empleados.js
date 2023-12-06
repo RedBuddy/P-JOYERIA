@@ -189,7 +189,7 @@ async function crearFormulario(campos) {
         } else if (campo === 'Fecha_ingreso' || campo === 'Fecha_nacimiento') {
             formulario += `<input type="date" name="${campo}" id="${campo}" autocomplete="off">`;
         } else if (campo === 'Puesto') {
-            const opciones = [["Gerente", "Gerente"], ["Vendedor", "Vendedor"], ["Almacenista", "Almacenista"], ["Asistente de ventas", "Asistente de ventas"], ["Comprador", "Comprador"]];
+            const opciones = [["Gerente", "Gerente"], ["Vendedor", "Vendedor"], ["Almacenista", "Almacenista"],["Atencion al cliente","Atencion al cliente"], ["Artesano", "Artesano"],  ["Asistente de ventas", "Asistente de ventas"], ["Encargado de compras", "Encargado de compras"], ["Contabilidad","Contabilidad"]];
             formulario += generateSelectField(campo, opciones, tipoTabla);
         } else if (campo === 'Turno') {
             formulario += generateSelectField(campo, [["Matutino", "Matutino"], ["Vespertino", "Vespertino"]]);
@@ -377,7 +377,7 @@ async function crearFormularioLlenado(campos, datos) {
             formulario += `<input type="text" name="${campo}" id="${campo}" autocomplete="off" value="${datos[posicion] || ''}">`;
         }
         else if (campo === 'Puesto') {
-            const opciones = [["Gerente", "Gerente"], ["Vendedor", "Vendedor"], ["Almacenista", "Almacenista"], ["Asistente de ventas", "Asistente de ventas"], ["Comprador", "Comprador"]];
+            const opciones = [["Gerente", "Gerente"], ["Vendedor", "Vendedor"], ["Almacenista", "Almacenista"],["Atencion al cliente","Atencion al cliente"], ["Artesano", "Artesano"],  ["Asistente de ventas", "Asistente de ventas"], ["Encargado de compras", "Encargado de compras"], ["Contabilidad","Contabilidad"]];
             formulario += generateSelectField(campo, opciones, datos[posicion]);
         } else if (campo === 'Turno') {
             const opciones = [["Matutino", "Matutino"], ["Vespertino", "Vespertino"]];

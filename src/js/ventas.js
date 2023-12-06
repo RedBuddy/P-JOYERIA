@@ -442,7 +442,7 @@ function aumentarEliminar(e, productosAVender) {
         if (productoEncontrado.CANTIDAD < productoSiSePuede.CANTIDAD) {
           productoEncontrado.CANTIDAD++;
         } else {
-          alert(`Ya no hay mas ${productoEncontrado.NOMBRE} en el almacen`);
+        swal(`Ya no hay mas ${productoEncontrado.NOMBRE} en el almacen`,'','error');
         }
       } else if (e.target.classList.contains('eliminar')) {
         productoEncontrado.CANTIDAD--;

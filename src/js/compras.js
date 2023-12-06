@@ -38,7 +38,8 @@ opcionesCompra.forEach((opcion) => {
             tipoTabla = 'compra';
             accionTabla = 'agregar';
         }else if (opcionSeleccionada.contains('detalle_compra')) {
-            opcionVentaSeleccionada = 'detalle_compra';
+            console.log('hola');
+            opcionCompraSeleccionada = 'detalle_compra';
             tipoTabla = 'detalle_compra';
             accionTabla = 'consultar';
           }
@@ -62,13 +63,15 @@ function pintarHtml() {
     } else if (opcionCompraSeleccionada === 'registrar_abono') {
         campos = ["Id"];
         API(divDatos, campos, thTabla);
-    }else if(opcionVentaSeleccionada === 'detalle_compra'){
+    }else if(opcionCompraSeleccionada === 'detalle_compra'){
+        console.log('hola');
         thTabla = ["ID_COMPRA","ID_MATERIA_PRIMA","CANTIDAD"];
         API(divDatos, campos,  thTabla);
       }
 }
 
 async function API(divDatos, campos, thTabla) {
+    console.log(thTabla);
     if (accionTabla === 'agregar' && opcionCompraSeleccionada === 'registrar_compra') {
         let div = document.createElement('div');
         div.classList.add('form-datos');
@@ -89,7 +92,7 @@ async function API(divDatos, campos, thTabla) {
                 let div = document.createElement('div');
                 div.classList.add('form-datos');
                 console.log(await crearFormularioNav(campos));
-                div.innerHTML = await crearFormularioNav(campos);
+                div.innerHTML = await crearFormularioNavCurioso(campos);
                 if (opcionCompraSeleccionada === 'registrar_compra') {
                     div.innerHTML += `<ul id="product"></ul> `;
                 }
@@ -124,7 +127,9 @@ async function API(divDatos, campos, thTabla) {
                     e.preventDefault();
                     if (input.value > 0) {
                         let objetoEncontrado = productos.find(objeto => objeto.ID === parseInt(input.value));
-                        console.log(objetoEncontrado);
+                        if(objetoEncontrado === undefined || objetoEncontrado === null){
+                            swal("El producto no se encuentra en el almacen",'','error');
+                        }
                         agregarProductoAcumulado(objetoEncontrado);
                         let tabla = construirTabla(divDatosVenta, productosComprasAcumuladas, ["ID", "NOMBRE", "PRECIO", "UNIDAD", "CANTIDAD", " + ", " - "], productos);
                         divPanel.append(tabla);
@@ -141,7 +146,7 @@ async function API(divDatos, campos, thTabla) {
 
 
 
-    } else if(accionTabla === 'consultar' && opcionVentaSeleccionada === 'detalle_compra'){
+    } else if(accionTabla === 'consultar' && opcionCompraSeleccionada === 'detalle_compra'){
         let datos = await obtenerDatos(tipoTabla);
         divPanel.append(divDatos);
         divPanel.append(construirTablas(datos, thTabla));
@@ -222,13 +227,74 @@ async function API(divDatos, campos, thTabla) {
     }
 }
 
+function construirTablas(datos, thTabla) {
+    let quitarTabla = document.querySelector('.panel .tablas .tabla');
+    if (quitarTabla) {
+        quitarTabla.remove();
+    }else{
+        console.log('hola');
+    }
+    const div = document.createElement('div');
+    div.classList.add('tablas');
+    const tabla = document.createElement('table');
+    tabla.classList.add('tabla');
+    // Encabezado de la tabla
+    const thead = document.createElement('thead');
+    const trHead = document.createElement('tr');
+    thTabla.forEach((thText) => {
+        const th = document.createElement('th');
+        let titulo = formatText(thText);
+        th.textContent = titulo;
+        trHead.appendChild(th);
+    });
+    thead.appendChild(trHead);
+    tabla.appendChild(thead);
+  
+    // Cuerpo de la tabla
+    const tbody = document.createElement('tbody');
+  
+    if (datos && datos.length > 0) {
+        datos.forEach((fila) => {
+            const tr = document.createElement('tr');
+            thTabla.forEach((columna) => {
+                const td = document.createElement('td');
+                if (columna === 'FECHA') {
+                    if (fila[columna]) {
+                        let fechaAPI = fila[columna];
+                        // Obtener solo la parte de la fecha con slice
+                        let fechaFormateada = fechaAPI.slice(0, 10);
+                        td.textContent = fechaFormateada;
+                    }
+                }else{
+                    td.textContent = fila[columna];  // Utilizar directamente la columna como clave
+                }
+                tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+        });
+    } else {
+        // Crear una fila de "sin datos" si no hay datos
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.textContent = 'Sin datos disponibles';
+        td.colSpan = thTabla.length;
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+    }
+  
+    tabla.appendChild(tbody);
+    div.append(tabla);
+    // Limpiar y añadir la tabla al contenedor
+    return div;
+  }
+
 function colocarTotal() {
     let inputTotal = document.querySelector('.panel .tablas .formulario #formulario-registro #Monto_total');
     let sumaTotal = 0;
 
 
     productosComprasAcumuladas.forEach(producto => {
-        if (producto.UNIDAD_MEDIDA === 'Gramos' || producto.UNIDAD_MEDIDA === 'GRAMOS') {
+        if ((producto.UNIDAD_MEDIDA === 'Gramos' || producto.UNIDAD_MEDIDA === 'GRAMOS' || producto.UNIDAD_MEDIDA === 'Centimetros' )) {
             sumaTotal += parseInt(producto.PRECIO) * (parseInt(producto.CANTIDAD) / 100);
         } else {
             sumaTotal += parseInt(producto.PRECIO) * parseInt(producto.CANTIDAD);
@@ -386,13 +452,13 @@ function aumentarEliminar(e, productosAVender) {
         if (productoEncontrado) {
             // Si el producto ya existe, incrementar la cantidad
             if (e.target.classList.contains('agregar')) {
-                if (productoEncontrado.UNIDAD_MEDIDA === 'GRAMOS' || productoEncontrado.UNIDAD_MEDIDA === 'Gramos') {
+                if (productoEncontrado.UNIDAD_MEDIDA === 'GRAMOS' || productoEncontrado.UNIDAD_MEDIDA === 'Gramos' || productoEncontrado.UNIDAD_MEDIDA === 'Centimetros') {
                     productoEncontrado.CANTIDAD += 100;
                 } else {
                     productoEncontrado.CANTIDAD++;
                 }
             } else if (e.target.classList.contains('eliminar')) {
-                if (productoEncontrado.UNIDAD_MEDIDA === 'GRAMOS' || productoEncontrado.UNIDAD_MEDIDA === 'Gramos') {
+                if (productoEncontrado.UNIDAD_MEDIDA === 'GRAMOS' || productoEncontrado.UNIDAD_MEDIDA === 'Gramos' || productoEncontrado.UNIDAD_MEDIDA === 'Centimetros') {
                     productoEncontrado.CANTIDAD -= 100;
                 } else {
                     productoEncontrado.CANTIDAD--;
@@ -415,6 +481,40 @@ async function crearFormularioNav(campos) {
     for (const campo of campos) {
         let titulo = formatText(campo);
         let input = `<input type="number" name="${campo}" id="${campo}" class=""></input>`;
+
+        if (campo === 'Tipo_compra') {
+            const opciones = [['Contado', 'Contado'], ['Credito', 'Credito']];
+            input = generateSelectField(campo, opciones);
+        } else if (campo === 'Id_proveedor') {
+            let tabla = 'proveedor';
+
+            try {
+                const datosSelect = await obtenerDatos(tabla);
+                console.log(datosSelect);
+                input = generateSelectField(campo, datosSelect);
+                console.log(input);
+            } catch (error) {
+                // Manejo de errores aquí
+                console.error(error);
+            }
+        }
+
+        formulario += `
+          <label>${titulo}</label>
+          ${input}
+          <input type="submit" name="${campo}" id="${campo}" value="Buscar" class="producto">`;
+    }
+
+    formulario += '</form>';
+    return formulario;
+}
+
+async function crearFormularioNavCurioso(campos) {
+    let formulario = '<form action="" class="form" name="nav" autocomplete="off">';
+
+    for (const campo of campos) {
+        let titulo = formatText(campo);
+        let input = `<input type="text" name="${campo}" id="${campo}" class=""></input>`;
 
         if (campo === 'Tipo_compra') {
             const opciones = [['Contado', 'Contado'], ['Credito', 'Credito']];
@@ -510,7 +610,8 @@ function agregarProductoAcumulado(producto) {
         // Si el producto ya existe, incrementar la cantidad
         productosComprasAcumuladas[productoExistenteIndex].CANTIDAD++;
     } else {
-        // Si el producto no existe, agregarlo al array acumulado con cantidad 1
+        console.log(producto.ID);
+        
         const productoAcumulado = {
             ID: producto.ID,
             NOMBRE: producto.NOMBRE,
@@ -518,7 +619,7 @@ function agregarProductoAcumulado(producto) {
             UNIDAD_MEDIDA: producto.UNIDAD_DE_MEDIDA
         };
 
-        if (producto.UNIDAD_DE_MEDIDA === 'Gramos' || producto.UNIDAD_DE_MEDIDA === 'GRAMOS') {
+        if (producto.UNIDAD_DE_MEDIDA === 'Gramos' || producto.UNIDAD_DE_MEDIDA === 'GRAMOS' || producto.UNIDAD_DE_MEDIDA === 'Centimetros') {
             productoAcumulado.CANTIDAD = 100;
         } else {
             productoAcumulado.CANTIDAD = 1;

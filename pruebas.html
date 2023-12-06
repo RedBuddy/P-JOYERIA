@@ -6,102 +6,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Autocompletado de productos por nombre o categoría</title>
   <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
-  <style>
-    /* Agrega algún estilo según tus preferencias */
-    #searchInput {
-      padding: 10px;
-      margin: 10px;
-    }
 
-    #productList {
-      list-style-type: none;
-      padding: 0;
-      margin: 0;
-      position: absolute;
-      border: 1px solid #ccc;
-      background-color: #fff;
-      max-height: 150px;
-      overflow-y: auto;
-      display: none;
-    }
-
-    #productList li {
-      cursor: pointer;
-      padding: 5px;
-    }
-  </style>
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://unpkg.com/jspdf-invoice-template@1.4.0/dist/index.js"></script>
 </head>
 
 <body>
+  <h1>Create PDF</h1>
 
-  <!-- Input donde el usuario escribirá la categoría o el nombre del producto -->
+  <button onclick="generatePDF()">Generate PDF</button>
 
-  <table id="tablaProductos" class="display">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Precio</th>
-        <th>Cantidad</th>
-        <th>Total</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Aquí se agregarán las filas de productos -->
-    </tbody>
-  </table>
-
-  <!-- Script JavaScript para el autocompletado -->
-  <script>
-    $(document).ready(function () {
-      $('#tablaProductos').DataTable();
-    });
-
-    const btnAgregar = document.getElementById('btnAgregar');
-    btnAgregar.addEventListener('click', agregarProductoATabla);
-
-    function agregarProductoATabla() {
-      // Obtener detalles del producto (puedes obtenerlos de un formulario u otro lugar)
-      const producto = {
-        id: id/* ID del producto */,
-        nombre: nombre /* Nombre del producto */,
-        precio:  precio/* Precio del producto */,
-        cantidad:  cantidad/* Cantidad seleccionada */,
-      };
-
-      // Validar que la cantidad sea un número positivo
-      if (isNaN(producto.cantidad) || producto.cantidad <= 0) {
-        alert('La cantidad debe ser un número positivo.');
-        return;
-      }
-
-      // Agregar el producto a la tabla utilizando DataTables
-      const tabla = $('#tablaProductos').DataTable();
-      tabla.row.add([
-        producto.id,
-        producto.nombre,
-        producto.precio,
-        producto.cantidad,
-        producto.precio * producto.cantidad, // Total
-        '<button onclick="eliminarFila(this)">Eliminar</button>', // Acción de eliminar
-      ]).draw();
-    }
-
-    function eliminarFila(botonEliminar) {
-      const tabla = $('#tablaProductos').DataTable();
-      const fila = $(botonEliminar).closest('tr');
-      tabla.row(fila).remove().draw();
-    }
-
-    
-
-  </script>
-
-  <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script type="text/javascript" charset="utf8"
-    src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
 </body>
+  <script src="prueba.js"></script>
 
 </html>

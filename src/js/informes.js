@@ -4,6 +4,7 @@ let divPanel = document.querySelector('.panel');
 let opcionInformeSeleccionada;
 let tipoTabla;
 let accionTabla;
+let apiResult;
 
 //Verificacion de permiso para el subsistema
 import { verificar_permiso_subsistema, verificar_permiso_modulo, contenido_denegado } from "./loggin.js";
@@ -26,6 +27,8 @@ opcionesInformes.forEach((opcion) => {
             opcionInformeSeleccionada = 'ventas_fecha';
         } else if (opcionSeleccionada.contains('clientes_frecuentes')) {
             opcionInformeSeleccionada = 'clientes_frecuentes';
+        } else if (opcionSeleccionada.contains('factura')) {
+            opcionInformeSeleccionada = 'factura';
         }
         pintarHtml();
     });
@@ -40,7 +43,7 @@ async function pintarHtml() {
         construirGrafica(divDatos, productosMasVendidos);
     } else if (opcionInformeSeleccionada === 'clientes_frecuentes') {
         let clientes = await ponerDatosA('obtenerClientesFrecuentes');
-        construirGrafica(divDatos,clientes);
+        construirGrafica(divDatos, clientes);
     } else if (opcionInformeSeleccionada === 'ventas_fecha') {
         campos = ["Fecha_inicio", "Fecha_fin"];
         crearFormulario(campos).then(formularioHTML => {
@@ -60,7 +63,73 @@ async function pintarHtml() {
             .catch(error => {
                 console.error('Error al crear el formulario:', error);
             });
+    } else if (opcionInformeSeleccionada === 'factura') {
+        campos = ["Id_venta"];
+        API(divDatos, campos);
     }
+}
+
+async function API(divCampos, campos) {
+    let div = document.createElement('div');
+    div.classList.add('form-datos');
+    div.innerHTML = await crearFormularioNav(campos);
+    divPanel.append(div);
+    let btnRegistrar = document.querySelector('.form-datos form input[type="submit"]');
+    btnRegistrar.addEventListener('click', async (e) => {
+        e.preventDefault();
+        let formularioCorrecto = validarFormularioInput('nav');
+        if (formularioCorrecto) {
+            let form = document.querySelector('.form-datos form');
+            console.log(form);
+            apiResult = await ponerDatos(form, 'obtenerDetalleVenta');
+            let idCliente = apiResult[0].ID_CLIENTE;
+            let cliente = await obtenerDatosId('clientes', idCliente);
+            let fecha_venta = (apiResult[0].FECHA_DE_VENTA).slice(0, 10);
+            let idVenta = apiResult[0].ID_VENTA;
+            pdfalvo(cliente, fecha_venta, idVenta);
+        }
+    });
+}
+
+async function crearFormularioNav(campos) {
+    let formulario = '<form action="" class="form" name="nav" autocomplete="off">';
+
+    for (const campo of campos) {
+        let titulo = formatText(campo);
+        let input = `<input type="number" name="${campo}" id="${campo}" class=""></input>`;
+
+        formulario += `
+          <label>${titulo}</label>
+          ${input}
+          <input type="submit" name="${campo}" id="${campo}" value="Buscar" class="producto">`;
+    }
+
+    formulario += '</form>';
+    return formulario;
+}
+
+function obtenerDatosId(tipoTabla, id) {
+    return new Promise((resolve, reject) => {
+        // Realizar una solicitud GET a la API con el ID proporcionado
+        fetch(`http://localhost:3000/${tipoTabla}/${id}`, {
+            method: 'GET',
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Error en la solicitud: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Resolver la promesa con los datos obtenidos
+                console.log(data)
+                resolve(data);
+            })
+            .catch(error => {
+                // Rechazar la promesa en caso de error
+                reject(error);
+            });
+    });
 }
 
 async function crearFormulario(campos) {
@@ -85,9 +154,9 @@ function construirGrafica(divDatos, contenido) {
     divDatos.classList.add('tablas');
     divDatos.innerHTML = `<div id="chartContainer" style="width: 800px; height: 800px;"></div>`;
     divPanel.append(divDatos);
-    if(opcionInformeSeleccionada === 'productos_top'){
+    if (opcionInformeSeleccionada === 'productos_top') {
         activarGrafica(contenido);
-    }else{
+    } else {
         clientes_frecuentes(contenido);
     }
 }
@@ -135,51 +204,51 @@ function clientes_frecuentes(datosClientes) {
     console.log(datosClientes);
     const clientesUnicos = Array.from(new Set(datosClientes.map((cliente) => cliente.NombreCliente)));
 
-// Crear datasets dinámicos
-const datasets = clientesUnicos.map((cliente) => {
-    const colorAleatorio = generarColorAleatorio();
+    // Crear datasets dinámicos
+    const datasets = clientesUnicos.map((cliente) => {
+        const colorAleatorio = generarColorAleatorio();
 
-    // Filtrar datos para el cliente actual
-    const datosCliente = datosClientes.filter((dato) => dato.NombreCliente === cliente);
+        // Filtrar datos para el cliente actual
+        const datosCliente = datosClientes.filter((dato) => dato.NombreCliente === cliente);
 
-    // Calcular la cantidad total de compras y dinero gastado por el cliente
-    const cantidadTotalCompras = datosCliente.reduce((total, dato) => total + dato.CantidadCompras, 0);
-    const cantidadTotalGastado = datosCliente.reduce((total, dato) => total + dato.TotalGastado, 0);
+        // Calcular la cantidad total de compras y dinero gastado por el cliente
+        const cantidadTotalCompras = datosCliente.reduce((total, dato) => total + dato.CantidadCompras, 0);
+        const cantidadTotalGastado = datosCliente.reduce((total, dato) => total + dato.TotalGastado, 0);
 
-    return {
-        label: cliente,
-        backgroundColor: `${colorAleatorio}`,
-        borderColor: `${colorAleatorio}`,
-        borderWidth: 1,
-        data: [cantidadTotalGastado, cantidadTotalCompras],
+        return {
+            label: cliente,
+            backgroundColor: `${colorAleatorio}`,
+            borderColor: `${colorAleatorio}`,
+            borderWidth: 1,
+            data: [cantidadTotalGastado, cantidadTotalCompras],
+        };
+    });
+
+    // Crear el objeto de datos para el gráfico
+    const salesData = {
+        labels: ["Total Gastado"],
+        datasets: datasets,
     };
-});
 
-// Crear el objeto de datos para el gráfico
-const salesData = {
-    labels: ["Total Gastado"],
-    datasets: datasets,
-};
+    // Crear un elemento canvas y agregarlo al contenedor
+    let canvas = document.createElement('canvas');
+    canvas.width = 400;
+    canvas.height = 200;
+    document.getElementById('chartContainer').appendChild(canvas);
 
-// Crear un elemento canvas y agregarlo al contenedor
-let canvas = document.createElement('canvas');
-canvas.width = 400;
-canvas.height = 200;
-document.getElementById('chartContainer').appendChild(canvas);
-
-// Configurar el contexto y dibujar el gráfico
-var ctx = canvas.getContext('2d');
-var myChart = new Chart(ctx, {
-    type: 'bar',
-    data: salesData,
-    options: {
-        scales: {
-            y: {
-                beginAtZero: true,
+    // Configurar el contexto y dibujar el gráfico
+    var ctx = canvas.getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: salesData,
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                },
             },
         },
-    },
-});
+    });
 }
 
 async function tomarDatos(e) {
@@ -361,3 +430,130 @@ btn_logout.addEventListener('click', (e) => {
     window.location.href = '../../index.html';
     localStorage.setItem('nivel_acceso', sinlog);
 })
+
+function generateInvoiceData(invoiceNumber, paymentDate, items) {
+    return {
+        label: "Factura #: ",
+        num: invoiceNumber,
+        invDate: "Fecha de venta: " + paymentDate,
+        invGenDate: "Fecha de factura: " + getCurrentDate(),
+        headerBorder: false,
+        tableBodyBorder: false,
+        header: [
+            { title: "#", style: { width: 10 } },
+            { title: "Nombre", style: { width: 30 } },
+            { title: "Precio" },
+            { title: "Cantidad" },
+            { title: "Total" },
+        ],
+        table: items.map((item, index) => [
+            index + 1,
+            item.NOMBRE_PRODUCTO || item.title, // Use appropriate property for title
+            item.PRECIO_VENTA || item.price,
+            item.CANTIDAD || item.quantity,
+            item.TOTAL || item.total,
+        ]),
+        additionalRows: [{
+            col1: 'Total:',
+            col2: `${items[0].totalVenta}`,
+            col3: 'ALL',
+            style: {
+                fontSize: 14 //optional, default 12
+            }
+        }]
+    };
+}
+
+// Example data for the invoice
+
+// Generate dynamic invoice data
+
+// Generate dynamic invoice data
+
+
+// Assuming you have a function to get the current date
+function getCurrentDate() {
+    var currentDate = new Date();
+    var formattedDate = currentDate.toISOString().slice(0, 10);
+    return formattedDate;
+}
+
+
+// Merge with the rest of your props
+
+
+
+function pdfalvo(cliente, fecha_venta, idVenta) {
+    let invoiceNumber = idVenta;
+    let paymentDate = `${fecha_venta}`;
+
+    // Transform the array of objects to match the expected structure
+    let items = apiResult.map((resultItem) => ({
+        title: resultItem.NOMBRE_PRODUCTO,
+        price: resultItem.PRECIO_VENTA,
+        quantity: resultItem.CANTIDAD,
+        total: resultItem.TOTAL_PRODUCTO,
+        totalVenta : resultItem.TOTAL_VENTA
+    }));
+
+    console.log(items)
+    let dynamicInvoice = generateInvoiceData(invoiceNumber, paymentDate, items);
+
+    let props = {
+        outputType: jsPDFInvoiceTemplate.OutputType.Save,
+        returnJsPDFDocObject: true,
+        fileName: "Facutra 2023",
+        orientationLandscape: false,
+        compress: true,
+        logo: {
+            src: "../src/img/logo.jpg",
+            type: 'JPG', //optional, when src= data:uri (nodejs case)
+            width: 53.33, //aspect ratio = width/height
+            height: 26.66,
+            margin: {
+                top: 0, //negative or positive num, from the current position
+                left: 0 //negative or positive num, from the current position
+            }
+        },
+        stamp: {
+            inAllPages: true, //by default = false, just in the last page
+            src: "https://raw.githubusercontent.com/edisonneza/jspdf-invoice-template/demo/images/qr_code.jpg",
+            type: 'JPG', //optional, when src= data:uri (nodejs case)
+            width: 20, //aspect ratio = width/height
+            height: 20,
+            margin: {
+                top: 0, //negative or positive num, from the current position
+                left: 0 //negative or positive num, from the current position
+            }
+        },
+        business: {
+            name: "Zhoe Parodi",
+            address: "Fraccionamiento Estrella",
+            phone: "6681930210",
+            email: "zhoeparodi@gmail.com",
+        },
+        contact: {
+            label: "Factura para:",//todo esta seran los campos del cliente
+            name: `${cliente.NOMBRE}`,
+            address: `${cliente.DIRECCION}`,
+            phone: `${cliente.TELEFONO}`,
+            email: `${cliente.CORREO}`,
+        },
+        invoice: dynamicInvoice,
+        footer: {
+            text: `El total de la venta fue de ${items[0].totalVenta}`,
+        },
+        pageEnable: true,
+        pageLabel: "Page ",
+    };
+
+console.log(cliente)
+
+    generatePDF(props);
+}
+
+function generatePDF(props) {
+
+    //or in browser
+    var pdfObject = jsPDFInvoiceTemplate.default(props);
+  }

@@ -414,7 +414,7 @@ async function crearFormularioLlenado(campos, datos) {
 
             formulario += generateSelectField(campo, opciones, tipoTabla);
         } else if (campo === 'Unidad_de_medida') {
-            const opciones = [['Gramos', 'Gramos'], ['Pieza', 'Pieza']];
+            const opciones = [['Gramos', 'Gramos'], ['Pieza', 'Pieza'], ['Centimetros', 'Centimetros']];
             formulario += generateSelectField(campo, opciones, datos[posicion]);
         } else if (campo === 'Id_proveedor' || campo === 'Id_categoria') {
             //AQUI ES CUANDO QUIERO CONSEGUIR LOS ELEMENTOS DEL SELECT DEPENDIENDO QUE TABLA SEA
@@ -708,7 +708,7 @@ async function crearFormulario(campos) {
             const opciones = [["entrada", "Entrada"], ["salida", "Salida"]];
             formulario += generateSelectField(campo, opciones, tipoTabla);
         } else if (campo === 'Unidad_de_medida') {
-            formulario += generateSelectField(campo, [['Gramos', 'Gramos'], ['Pieza', 'Pieza']]);
+            formulario += generateSelectField(campo, [['Gramos', 'Gramos'], ['Pieza', 'Pieza'], ['Centimetros', 'Centimetros']]);
         } else if (campo === 'Id_proveedor' || campo === 'Id_categoria' || campo === "ID_MP" || campo === 'Id_materia_prima' || campo === 'ID_PT' || campo === 'Id_producto') {
             let tabla;
             if (campo === 'Id_proveedor') {
